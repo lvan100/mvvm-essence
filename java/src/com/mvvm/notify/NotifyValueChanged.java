@@ -13,8 +13,10 @@ public class NotifyValueChanged<T> implements INotifyValueChanged<T> {
      */
     private List<OnValueChanged> valueChangedList = new ArrayList<>();
 
-    @Override
-    public void notifyValueChanged(T newValue) {
+    /**
+     * 通知值变化
+     */
+    protected void notifyValueChanged(T newValue) {
         for (OnValueChanged vc : valueChangedList) {
             System.out.println(this.toString() + ":NotifyValueChanged.OnValueChanged");
             vc.onValueChanged(newValue);

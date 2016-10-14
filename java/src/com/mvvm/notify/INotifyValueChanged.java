@@ -8,11 +8,6 @@ package com.mvvm.notify;
 public interface INotifyValueChanged<T> {
 
     /**
-     * 通知值变化
-     */
-    void notifyValueChanged(T newValue);
-
-    /**
      * 添加值变化监视器
      */
     void addValueChanged(OnValueChanged<T> valueChanged);
