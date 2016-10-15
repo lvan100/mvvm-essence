@@ -2,6 +2,8 @@ package com.mvvm.binding;
 
 import com.mvvm.notify.IPropertyChangedSupport;
 
+import static com.print.PrintHelper.PRINT_HELPER;
+
 /**
  * 数据绑定的实现。
  *
@@ -76,6 +78,21 @@ public class DataBinding<T> implements DataBindingInterface<T> {
     }
 
     /**
+     * 值转换器
+     */
+    private ValueConverter<T> converter = new ValueConverter<T>() {
+        @Override
+        public T convert(Object value) {
+            return (T) value;
+        }
+    };
+
+    @Override
+    public void setValueConverter(ValueConverter<T> converter) {
+        this.converter = converter;
+    }
+
+    /**
      * 获取目标绑定对象的值
      */
     T getTargetValue() {
@@ -87,8 +104,8 @@ public class DataBinding<T> implements DataBindingInterface<T> {
      * 获取源绑定对象的属性值
      */
     T getSourceValue() {
-        System.out.println(this.toString() + ":getSourceValue");
-        return (T) source.getProperty(sourcePropertyName);
+        PRINT_HELPER.print(this.toString() + ":getSourceValue");
+        return converter.convert(source.getProperty(sourcePropertyName));
     }
 
     /**
@@ -114,10 +131,19 @@ public class DataBinding<T> implements DataBindingInterface<T> {
                     .addPropertyChangedNotify(target.valueProperty, source);
         }
 
-        System.out.println(this.toString() + ":build");
+        PRINT_HELPER.enterPrint(this.toString() + ":build.begin");
 
-        source.getPropertyChangedHandler()
-                .notifyPropertyChanged(null, source, sourcePropertyName);
+        if (source instanceof DependencyObject) {
+            DependencyObject dependencyObj = (DependencyObject) source;
+            dependencyObj.getPropertyChangedHandler().notifyPropertyChanged(
+                    dependencyObj.getDataBinding().getSource(), source, sourcePropertyName);
+
+        } else {
+            source.getPropertyChangedHandler()
+                    .notifyPropertyChanged(null, source, sourcePropertyName);
+        }
+
+        PRINT_HELPER.exitPrint(this.toString() + ":build.end");
     }
 
     @Override

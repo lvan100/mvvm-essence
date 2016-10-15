@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.print.PrintHelper.PRINT_HELPER;
+
 /**
  * 属性值变化处理器
  */
@@ -27,8 +29,13 @@ public class PropertyChangedHandler {
         if (notifyList != null) {
             for (IPropertyChangedSupport notify : notifyList) {
                 if (notify != exclude) {
-                    System.out.println(this.toString() + ":PropertyChangedHandler.onPropertyChanged");
+                    PRINT_HELPER.enterPrint(this.toString() +
+                            ":PropertyChangedHandler.onPropertyChanged.begin");
+
                     notify.onPropertyChanged(source, propertyName);
+
+                    PRINT_HELPER.exitPrint(this.toString() +
+                            ":PropertyChangedHandler.onPropertyChanged.end");
                 }
             }
         }

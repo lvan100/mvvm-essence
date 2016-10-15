@@ -3,6 +3,8 @@ package com.mvvm.model;
 import com.mvvm.notify.IPropertyChangedSupport;
 import com.mvvm.notify.PropertyChangedHandler;
 
+import static com.print.PrintHelper.PRINT_HELPER;
+
 /**
  * 数据模型的实现
  */
@@ -66,7 +68,7 @@ public class Model<T> extends PropertyChangedHandler implements ModelInterface<T
 
     @Override
     public Object getProperty(String propertyName) {
-        System.out.println(this.toString() + ":Model.getProperty[\"" + propertyName + "\"]");
+        PRINT_HELPER.print(this.toString() + ":Model.getProperty[\"" + propertyName + "\"]");
         if (valueProperty.equals(propertyName)) {
             return getValue(); // 子类可能会覆盖 getValue() 函数
         }
@@ -75,7 +77,7 @@ public class Model<T> extends PropertyChangedHandler implements ModelInterface<T
 
     @Override
     public void setProperty(String propertyName, Object value) {
-        System.out.println(this.toString() + ":Model.setProperty[\"" + propertyName + "\"]");
+        PRINT_HELPER.print(this.toString() + ":Model.setProperty[\"" + propertyName + "\"]");
         if (valueProperty.equals(propertyName)) {
             setValue((T) value);
         }

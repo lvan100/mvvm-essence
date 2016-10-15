@@ -1,12 +1,12 @@
-package com.example.view;
+package com.mvvm.view;
 
 import com.mvvm.binding.DataBinding;
 import com.mvvm.binding.DependencyObject;
 import com.mvvm.model.Model;
 import com.mvvm.notify.EmptyPropertyChangedSupport;
 import com.mvvm.notify.IPropertyChangedSupport;
-import com.mvvm.view.AbstractView;
-import com.mvvm.view.Command;
+
+import static com.print.PrintHelper.PRINT_HELPER;
 
 /**
  * 文本输入框控件。
@@ -27,13 +27,15 @@ public class TextBox extends AbstractView {
 
                     @Override
                     public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
-                        System.out.println(getId() + ":onPropertyChanged");
+                        PRINT_HELPER.enterPrint(getId() + ":onPropertyChanged");
 
                         if (textValueChanged != null) {
                             textValueChanged.onCommand(TextBox.this);
                         }
 
                         show();
+
+                        PRINT_HELPER.exit();
                     }
 
                 });
@@ -86,7 +88,13 @@ public class TextBox extends AbstractView {
 
     @Override
     public void show() {
-        System.out.println(getId() + ":show[textValue=" + textValue.getValue() + "]");
+        PRINT_HELPER.enterPrint(getId() + ":show.begin");
+
+        PRINT_HELPER.enter();
+        PRINT_HELPER.print(getId() + ":show[textValue=" + textValue.getValue() + "]");
+        PRINT_HELPER.exit();
+
+        PRINT_HELPER.exitPrint(getId() + ":show.end");
     }
 
 }

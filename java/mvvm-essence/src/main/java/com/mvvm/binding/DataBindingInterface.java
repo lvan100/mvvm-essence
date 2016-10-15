@@ -51,4 +51,9 @@ interface DataBindingInterface<T> {
      */
     void setTarget(DependencyObject<T> target);
 
+    /**
+     * 设置值转换器
+     */
+    void setValueConverter(ValueConverter<T> converter);
+
 }

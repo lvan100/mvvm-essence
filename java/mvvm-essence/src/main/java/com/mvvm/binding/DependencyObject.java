@@ -3,6 +3,8 @@ package com.mvvm.binding;
 import com.mvvm.model.Model;
 import com.mvvm.notify.IPropertyChangedSupport;
 
+import static com.print.PrintHelper.PRINT_HELPER;
+
 /**
  * 依赖对象，数据模型+数据绑定，绑定后通过绑定获取真正的值。
  *
@@ -24,6 +26,13 @@ public class DependencyObject<T> extends Model<T> {
     }
 
     /**
+     * 获取数据绑定对象
+     */
+    public DataBinding<T> getDataBinding() {
+        return dataBinding;
+    }
+
+    /**
      * 设置数据绑定对象
      */
     public void setDataBinding(DataBinding<T> dataBinding) {
@@ -32,7 +41,7 @@ public class DependencyObject<T> extends Model<T> {
 
     @Override
     public T getValue() {
-        System.out.println(this.toString() + ":DependencyObject.getValue");
+        PRINT_HELPER.print(this.toString() + ":DependencyObject.getValue");
         if (dataBinding == null) {
             return super.getValue();
         } else {
@@ -42,7 +51,7 @@ public class DependencyObject<T> extends Model<T> {
 
     @Override
     public void setValue(T value) {
-        System.out.println(this.toString() + ":DependencyObject.setValue");
+        PRINT_HELPER.print(this.toString() + ":DependencyObject.setValue");
 
         if (dataBinding == null) {
             super.setValue(value);
@@ -53,7 +62,7 @@ public class DependencyObject<T> extends Model<T> {
 
     @Override
     public void setProperty(String propertyName, Object value) {
-        System.out.println(this.toString() + ":DependencyObject.setProperty[\"" + propertyName + "\"]");
+        PRINT_HELPER.print(this.toString() + ":DependencyObject.setProperty[\"" + propertyName + "\"]");
         if (dataBinding == null) {
             super.setProperty(propertyName, value);
 
@@ -66,17 +75,20 @@ public class DependencyObject<T> extends Model<T> {
 
     @Override
     public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
-        System.out.println(this.toString() + ":DependencyObject.onPropertyChanged");
+        PRINT_HELPER.enterPrint(this.toString() + ":DependencyObject.onPropertyChanged");
         if (dataBinding == null) {
             super.onPropertyChanged(eventSource, propertyName);
 
         } else {
 
-            System.out.println(this.toString() +
-                    ":DependencyObject.notifyPropertyChanged");
+            PRINT_HELPER.print(this.toString() +
+                    ":DependencyObject.notifyPropertyChanged.begin");
 
             // 通知其值已经发生变化
             notifyPropertyChanged(eventSource, this, valueProperty);
+
+            PRINT_HELPER.exitPrint(this.toString() +
+                    ":DependencyObject.notifyPropertyChanged.end");
         }
     }
 
