@@ -5,6 +5,9 @@ package com.print;
  */
 public class PrintHelper {
 
+    /**
+     * 全局单例
+     */
     public static final PrintHelper PRINT_HELPER = new PrintHelper();
 
     private int deep = -1;

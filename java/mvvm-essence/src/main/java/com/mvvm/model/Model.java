@@ -36,7 +36,7 @@ public class Model<T> extends PropertyChangedHandler implements ModelInterface<T
 
     @Override
     public T getValue() {
-        System.out.println(this.toString() + ":Model.getValue=" + value);
+        PRINT_HELPER.print(this.toString() + ":Model.getValue=" + value);
         return value;
     }
 
@@ -44,15 +44,18 @@ public class Model<T> extends PropertyChangedHandler implements ModelInterface<T
     public void setValue(T value) {
         if (!isReadOnly()) {
 
-            System.out.println(this.toString() + ":Model.setValue="
+            PRINT_HELPER.print(this.toString() + ":Model.setValue="
                     + this.value + "->" + value);
             this.value = value;
 
-            System.out.println(this.toString()
-                    + ":Model.notifyPropertyChanged");
+            PRINT_HELPER.enterPrint(this.toString()
+                    + ":Model.notifyPropertyChanged.begin");
 
             // 通知其值已经发生变化
             notifyPropertyChanged(null, this, valueProperty);
+
+            PRINT_HELPER.exitPrint(this.toString()
+                    + ":Model.notifyPropertyChanged.end");
         }
     }
 
@@ -90,19 +93,24 @@ public class Model<T> extends PropertyChangedHandler implements ModelInterface<T
 
     @Override
     public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
-        System.out.println(this.toString() + ":Model.onPropertyChanged");
+        PRINT_HELPER.enterPrint(this.toString() + ":Model.onPropertyChanged");
         if (!isReadOnly()) {
 
             T newValue = (T) eventSource.getProperty(propertyName);
-            System.out.println(this.toString() + ":Model.value="
+            PRINT_HELPER.print(this.toString() + ":Model.value="
                     + this.value + "->" + newValue);
             this.value = newValue;
 
-            System.out.println(this.toString()
-                    + ":Model.notifyPropertyChanged");
+            PRINT_HELPER.print(this.toString()
+                    + ":Model.notifyPropertyChanged.begin");
 
             // 通知其值已经发生变化
             notifyPropertyChanged(eventSource, this, valueProperty);
+
+            PRINT_HELPER.exitPrint(this.toString()
+                    + ":Model.notifyPropertyChanged.end");
+        } else {
+            PRINT_HELPER.exit();
         }
     }
 

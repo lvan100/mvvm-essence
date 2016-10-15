@@ -51,13 +51,24 @@ public class DependencyObject<T> extends Model<T> {
 
     @Override
     public void setValue(T value) {
-        PRINT_HELPER.print(this.toString() + ":DependencyObject.setValue");
+        PRINT_HELPER.enterPrint(this.toString() + ":DependencyObject.setValue.begin");
+        {
+            if (dataBinding == null) {
+                super.setValue(value);
+            } else {
+                dataBinding.setSourceValue(value);
 
-        if (dataBinding == null) {
-            super.setValue(value);
-        } else {
-            dataBinding.setSourceValue(value);
+                PRINT_HELPER.enterPrint(this.toString()
+                        + ":DependencyObject.notifyPropertyChanged.begin");
+
+                // 通知其值已经发生变化
+                notifyPropertyChanged(dataBinding.getSource(), this, valueProperty);
+
+                PRINT_HELPER.exitPrint(this.toString()
+                        + ":DependencyObject.notifyPropertyChanged.end");
+            }
         }
+        PRINT_HELPER.exitPrint(this.toString() + ":DependencyObject.setValue.end");
     }
 
     @Override
@@ -78,6 +89,7 @@ public class DependencyObject<T> extends Model<T> {
         PRINT_HELPER.enterPrint(this.toString() + ":DependencyObject.onPropertyChanged");
         if (dataBinding == null) {
             super.onPropertyChanged(eventSource, propertyName);
+            PRINT_HELPER.exit();
 
         } else {
 

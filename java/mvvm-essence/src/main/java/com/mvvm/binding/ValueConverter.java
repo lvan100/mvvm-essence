@@ -5,6 +5,18 @@ package com.mvvm.binding;
  */
 public interface ValueConverter<T> {
 
-    T convert(Object value);
+    /**
+     * 正向转换，Source -> Target
+     */
+    default T convert(Object value) {
+        return (T) value;
+    }
+
+    /**
+     * 反向转换，Target -> Source
+     */
+    default Object reverseConvert(T value) {
+        return value;
+    }
 
 }

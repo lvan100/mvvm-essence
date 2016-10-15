@@ -2,7 +2,6 @@ package com.mvvm.view;
 
 import com.mvvm.binding.DataBinding;
 import com.mvvm.binding.DependencyObject;
-import com.mvvm.model.Model;
 import com.mvvm.notify.EmptyPropertyChangedSupport;
 import com.mvvm.notify.IPropertyChangedSupport;
 
@@ -16,14 +15,14 @@ public class TextBox extends AbstractView {
     public static final String textProperty = "textValue";
 
     /**
-     * 文本数据模型
+     * 文本数据依赖对象
      */
     private DependencyObject<String> textValue = new DependencyObject<>("");
 
     {
-        // 文本内容的更新应该肯定会引起控件界面的刷新 //
+        // 更新文本内容会引起界面的刷新
         textValue.getPropertyChangedHandler().addPropertyChangedNotify(
-                textValue.valueProperty, new EmptyPropertyChangedSupport() {
+                DependencyObject.valueProperty, new EmptyPropertyChangedSupport() {
 
                     @Override
                     public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
@@ -46,10 +45,10 @@ public class TextBox extends AbstractView {
     }
 
     /**
-     * 获取文本内容
+     * 获取文本内容依赖对象
      */
-    public Model<String> getText() {
-        System.out.println(getId() + ":getText");
+    public DependencyObject<String> getText() {
+        PRINT_HELPER.print(getId() + ":getText");
         return textValue;
     }
 
@@ -57,13 +56,15 @@ public class TextBox extends AbstractView {
      * 设置文本内容
      */
     public void setText(String value) {
-        System.out.println(getId() + ":setText");
+        PRINT_HELPER.enterPrint(getId() + ":setText.begin");
         textValue.setValue(value);
+        PRINT_HELPER.exitPrint(getId() + ":setText.end");
     }
 
     /**
      * 为属性设置数据绑定。
      */
+    @Override
     public void setDataBinding(String propertyName, DataBinding<?> binding) {
 
         if (textProperty.equals(propertyName)) {

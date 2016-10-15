@@ -12,10 +12,9 @@ import static com.print.PrintHelper.PRINT_HELPER;
 public class DataBinding<T> implements DataBindingInterface<T> {
 
     /**
-     * 源绑定对象及其绑定属性
+     * 绑定类型
      */
-    private String sourcePropertyName;
-    private IPropertyChangedSupport source;
+    private BindingType type;
 
     /**
      * 目标绑定对象
@@ -23,9 +22,10 @@ public class DataBinding<T> implements DataBindingInterface<T> {
     private DependencyObject<T> target;
 
     /**
-     * 绑定类型
+     * 源绑定对象及其绑定属性
      */
-    private BindingType type;
+    private String sourcePropertyName;
+    private IPropertyChangedSupport source;
 
     public DataBinding(BindingType type) {
         this.type = type;
@@ -81,23 +81,11 @@ public class DataBinding<T> implements DataBindingInterface<T> {
      * 值转换器
      */
     private ValueConverter<T> converter = new ValueConverter<T>() {
-        @Override
-        public T convert(Object value) {
-            return (T) value;
-        }
     };
 
     @Override
     public void setValueConverter(ValueConverter<T> converter) {
         this.converter = converter;
-    }
-
-    /**
-     * 获取目标绑定对象的值
-     */
-    T getTargetValue() {
-        System.out.println(this.toString() + ":getTargetValue");
-        return target.getValue();
     }
 
     /**
@@ -112,8 +100,14 @@ public class DataBinding<T> implements DataBindingInterface<T> {
      * 设置源绑定对象的属性值
      */
     void setSourceValue(T newValue) {
-        System.out.println(this.toString() + ":setSourceValue");
-        source.setProperty(sourcePropertyName, newValue);
+        PRINT_HELPER.enterPrint(this.toString() + ":setSourceValue.begin");
+        {
+            if (getType() == BindingType.TwoWay) {
+                source.setProperty(sourcePropertyName,
+                        converter.reverseConvert(newValue));
+            }
+        }
+        PRINT_HELPER.exitPrint(this.toString() + ":setSourceValue.end");
     }
 
     /**
@@ -128,7 +122,7 @@ public class DataBinding<T> implements DataBindingInterface<T> {
 
         if (getType() == BindingType.TwoWay) {
             target.getPropertyChangedHandler()
-                    .addPropertyChangedNotify(target.valueProperty, source);
+                    .addPropertyChangedNotify(DependencyObject.valueProperty, source);
         }
 
         PRINT_HELPER.enterPrint(this.toString() + ":build.begin");

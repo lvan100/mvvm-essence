@@ -32,6 +32,8 @@ public interface IPropertyChangedSupport {
      * @param eventSource  属性发生变化的对象，要求实现 IPropertyChangedSupport 接口。
      * @param propertyName 发生变化的属性名称
      */
-    void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName);
+    default void onPropertyChanged(
+            IPropertyChangedSupport eventSource, String propertyName) {
+    }
 
 }

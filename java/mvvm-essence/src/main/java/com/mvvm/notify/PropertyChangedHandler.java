@@ -28,15 +28,20 @@ public class PropertyChangedHandler {
         List<IPropertyChangedSupport> notifyList = propertyChangedMap.get(propertyName);
         if (notifyList != null) {
             for (IPropertyChangedSupport notify : notifyList) {
-                if (notify != exclude) {
-                    PRINT_HELPER.enterPrint(this.toString() +
-                            ":PropertyChangedHandler.onPropertyChanged.begin");
+                PRINT_HELPER.enterPrint(this.toString() +
+                        ":PropertyChangedHandler.onPropertyChanged.begin");
+                {
+                    if (notify != exclude) {
+                        notify.onPropertyChanged(source, propertyName);
+                    } else {
 
-                    notify.onPropertyChanged(source, propertyName);
-
-                    PRINT_HELPER.exitPrint(this.toString() +
-                            ":PropertyChangedHandler.onPropertyChanged.end");
+                        PRINT_HELPER.enterPrint(this.toString() +
+                                ":PropertyChangedHandler.onPropertyChanged.skip");
+                        PRINT_HELPER.exit();
+                    }
                 }
+                PRINT_HELPER.exitPrint(this.toString() +
+                        ":PropertyChangedHandler.onPropertyChanged.end");
             }
         }
     }

@@ -20,8 +20,17 @@ public class Student implements IPropertyChangedSupport {
     }
 
     public void setName(String name) {
-        this.name = name;
-        handler.notifyPropertyChanged(null, this, nameProperty);
+        PRINT_HELPER.enterPrint(this.toString() + ":setName.begin");
+        {
+            this.name = name;
+
+            PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
+            {
+                handler.notifyPropertyChanged(null, this, nameProperty);
+            }
+            PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
+        }
+        PRINT_HELPER.exitPrint(this.toString() + ":setName.end");
     }
 
     //学生分数
@@ -34,8 +43,17 @@ public class Student implements IPropertyChangedSupport {
     }
 
     public void setScore(int score) {
-        this.score = score;
-        handler.notifyPropertyChanged(null, this, scoreProperty);
+        PRINT_HELPER.enterPrint(this.toString() + ":setScore.begin");
+        {
+            this.score = score;
+
+            PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
+            {
+                handler.notifyPropertyChanged(null, this, scoreProperty);
+            }
+            PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
+        }
+        PRINT_HELPER.exitPrint(this.toString() + ":setScore.end");
     }
 
     @Override
@@ -74,19 +92,6 @@ public class Student implements IPropertyChangedSupport {
     @Override
     public PropertyChangedHandler getPropertyChangedHandler() {
         return handler;
-    }
-
-    @Override
-    public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
-        PRINT_HELPER.enterPrint(this.toString() + "Student:onPropertyChanged");
-
-        setProperty(propertyName, eventSource.getProperty(propertyName));
-
-        PRINT_HELPER.enterPrint(this.toString() + "notifyPropertyChanged.begin");
-        handler.notifyPropertyChanged(eventSource, this, scoreProperty);
-        PRINT_HELPER.exitPrint(this.toString() + "notifyPropertyChanged.end");
-
-        PRINT_HELPER.exit();
     }
 
 }
