@@ -64,7 +64,6 @@ public class TextBox extends AbstractView {
     /**
      * 为属性设置数据绑定。
      */
-    @Override
     public void setDataBinding(String propertyName, DataBinding<?> binding) {
 
         if (textProperty.equals(propertyName)) {

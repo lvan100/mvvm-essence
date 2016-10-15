@@ -65,7 +65,6 @@ public class StudentView extends AbstractView {
     /**
      * 为属性设置数据绑定。
      */
-    @Override
     public void setDataBinding(String propertyName, DataBinding<?> binding) {
 
         if (titleProperty.equals(propertyName)) {
