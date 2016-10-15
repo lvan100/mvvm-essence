@@ -1,11 +1,12 @@
 package com.mvvm.model;
 
-import com.mvvm.notify.NotifyValueChanged;
+import com.mvvm.notify.IPropertyChangedSupport;
+import com.mvvm.notify.PropertyChangedHandler;
 
 /**
  * 数据模型的实现
  */
-public class Model<T> extends NotifyValueChanged<T> implements ModelInterface<T> {
+public class Model<T> extends PropertyChangedHandler implements ModelInterface<T> {
 
     /**
      * 客户端值
@@ -17,6 +18,11 @@ public class Model<T> extends NotifyValueChanged<T> implements ModelInterface<T>
      */
     private boolean readOnly = false;
 
+    /**
+     * 客户端值的属性名称
+     */
+    public static final String valueProperty = "value";
+
     public Model(T value) {
         this.value = value;
     }
@@ -27,33 +33,25 @@ public class Model<T> extends NotifyValueChanged<T> implements ModelInterface<T>
     }
 
     @Override
-    public void refresh() {
-        System.out.println(this.toString() + ":refresh");
-        notifyValueChanged(value);
-    }
-
-    @Override
     public T getValue() {
-        System.out.println(this.toString() + ":getValue=" + value);
+        System.out.println(this.toString() + ":Model.getValue=" + value);
         return value;
     }
 
     @Override
-    public void setValue(T value) throws IllegalAccessException {
-        if (readOnly) {
-            throw new IllegalAccessException();
+    public void setValue(T value) {
+        if (!isReadOnly()) {
+
+            System.out.println(this.toString() + ":Model.setValue="
+                    + this.value + "->" + value);
+            this.value = value;
+
+            System.out.println(this.toString()
+                    + ":Model.notifyPropertyChanged");
+
+            // 通知其值已经发生变化
+            notifyPropertyChanged(null, this, valueProperty);
         }
-
-        if (this.value == value) {
-            System.out.println(this.toString() + ":value is equal");
-            return; /*值相等的时候什么也不做，很重要！*/
-        }
-
-        System.out.println(this.toString() + ":setValue=" + this.value + "->" + value);
-        this.value = value;
-
-        // 通知其值已经发生变化
-        notifyValueChanged(value);
     }
 
     @Override
@@ -64,6 +62,46 @@ public class Model<T> extends NotifyValueChanged<T> implements ModelInterface<T>
     @Override
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
+    }
+
+    @Override
+    public Object getProperty(String propertyName) {
+        System.out.println(this.toString() + ":Model.getProperty[\"" + propertyName + "\"]");
+        if (valueProperty.equals(propertyName)) {
+            return getValue(); // 子类可能会覆盖 getValue() 函数
+        }
+        return null;
+    }
+
+    @Override
+    public void setProperty(String propertyName, Object value) {
+        System.out.println(this.toString() + ":Model.setProperty[\"" + propertyName + "\"]");
+        if (valueProperty.equals(propertyName)) {
+            setValue((T) value);
+        }
+    }
+
+    @Override
+    public PropertyChangedHandler getPropertyChangedHandler() {
+        return this;
+    }
+
+    @Override
+    public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
+        System.out.println(this.toString() + ":Model.onPropertyChanged");
+        if (!isReadOnly()) {
+
+            T newValue = (T) eventSource.getProperty(propertyName);
+            System.out.println(this.toString() + ":Model.value="
+                    + this.value + "->" + newValue);
+            this.value = newValue;
+
+            System.out.println(this.toString()
+                    + ":Model.notifyPropertyChanged");
+
+            // 通知其值已经发生变化
+            notifyPropertyChanged(eventSource, this, valueProperty);
+        }
     }
 
 }

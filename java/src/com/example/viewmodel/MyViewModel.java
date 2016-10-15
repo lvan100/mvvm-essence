@@ -47,17 +47,17 @@ public class MyViewModel {
     public MyViewModel() {
 
         myTextBox2.setDataBinding(TextBox.textProperty,
-                new DataBinding(BindingType.OneWay, myModel0));
+                new DataBinding(BindingType.OneWay, myModel0, myModel0.valueProperty));
 
         System.out.println();
 
         myTextBox3.setDataBinding(TextBox.textProperty,
-                new DataBinding(BindingType.TwoWay, myModel1));
+                new DataBinding(BindingType.TwoWay, myModel1, myModel1.valueProperty));
 
         System.out.println();
 
         myTextBox1.setDataBinding(TextBox.textProperty,
-                new DataBinding(BindingType.TwoWay, myTextBox3.getText()));
+                new DataBinding(BindingType.TwoWay, myTextBox3.getText(), myModel1.valueProperty));
 
         System.out.println();
 

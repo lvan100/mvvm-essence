@@ -12,11 +12,7 @@ public class Main {
         System.out.println();
 
         System.out.println("Main:changeModelDirectly");
-        try {
-            myViewModel.getMyModel1().setValue("2");
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        myViewModel.getMyModel1().setValue("2");
 
         System.out.println();
         System.out.println();

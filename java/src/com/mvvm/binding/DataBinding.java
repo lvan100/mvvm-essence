@@ -1,23 +1,36 @@
 package com.mvvm.binding;
 
-import com.mvvm.model.Model;
-import com.mvvm.notify.NotifyValueChanged;
+import com.mvvm.notify.IPropertyChangedSupport;
 
 /**
  * 数据绑定的实现。
+ *
+ * @param <T>
  */
-public class DataBinding<T> extends NotifyValueChanged<T> implements DataBindingInterface<T> {
+public class DataBinding<T> implements DataBindingInterface<T> {
 
-    private Model<T> source;
-    private Model<T> target;
+    /**
+     * 源绑定对象及其绑定属性
+     */
+    private String sourcePropertyName;
+    private IPropertyChangedSupport source;
 
+    /**
+     * 目标绑定对象
+     */
+    private DependencyObject<T> target;
+
+    /**
+     * 绑定类型
+     */
     private BindingType type;
 
     public DataBinding(BindingType type) {
         this.type = type;
     }
 
-    public DataBinding(BindingType type, Model<T> source) {
+    public DataBinding(BindingType type, IPropertyChangedSupport source, String sourcePropertyName) {
+        this.sourcePropertyName = sourcePropertyName;
         this.source = source;
         this.type = type;
     }
@@ -28,55 +41,88 @@ public class DataBinding<T> extends NotifyValueChanged<T> implements DataBinding
     }
 
     @Override
-    public DataBindingInterface<T> setType(BindingType type) {
+    public void setType(BindingType type) {
         this.type = type;
-        return this;
     }
 
     @Override
-    public void setTargetValue(T value) {
-        System.out.println(source.toString() + "->" + target.toString() +
-                ":DataBinding.setTargetValue");
-        try {
-            target.setValue(value);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void setSourceValue(T value) throws IllegalAccessException {
-        System.out.println(source.toString() + "->" + target.toString() +
-                ":DataBinding.setSourceValue");
-
-        if (getType() == BindingType.OneWay) {
-            throw new IllegalAccessException();
-        }
-
-        source.setValue(value);
-        notifyValueChanged(value);
-    }
-
-    @Override
-    public Model<T> getSource() {
+    public IPropertyChangedSupport getSource() {
         return source;
     }
 
     @Override
-    public DataBindingInterface<T> setSource(Model<T> source) {
+    public void setSource(IPropertyChangedSupport source) {
         this.source = source;
-        return this;
     }
 
     @Override
-    public Model<T> getTarget() {
+    public String getSourcePropertyName() {
+        return sourcePropertyName;
+    }
+
+    @Override
+    public void setSourcePropertyName(String propertyName) {
+        this.sourcePropertyName = propertyName;
+    }
+
+    @Override
+    public DependencyObject<T> getTarget() {
         return target;
     }
 
     @Override
-    public DataBindingInterface<T> setTarget(Model<T> target) {
+    public void setTarget(DependencyObject<T> target) {
         this.target = target;
-        return this;
+    }
+
+    /**
+     * 获取目标绑定对象的值
+     */
+    T getTargetValue() {
+        System.out.println(this.toString() + ":getTargetValue");
+        return target.getValue();
+    }
+
+    /**
+     * 获取源绑定对象的属性值
+     */
+    T getSourceValue() {
+        System.out.println(this.toString() + ":getSourceValue");
+        return (T) source.getProperty(sourcePropertyName);
+    }
+
+    /**
+     * 设置源绑定对象的属性值
+     */
+    void setSourceValue(T newValue) {
+        System.out.println(this.toString() + ":setSourceValue");
+        source.setProperty(sourcePropertyName, newValue);
+    }
+
+    /**
+     * 完成数据绑定的组装
+     */
+    public void build() {
+
+        target.setDataBinding(this);
+
+        source.getPropertyChangedHandler()
+                .addPropertyChangedNotify(sourcePropertyName, target);
+
+        if (getType() == BindingType.TwoWay) {
+            target.getPropertyChangedHandler()
+                    .addPropertyChangedNotify(target.valueProperty, source);
+        }
+
+        System.out.println(this.toString() + ":build");
+
+        source.getPropertyChangedHandler()
+                .notifyPropertyChanged(null, source, sourcePropertyName);
+    }
+
+    @Override
+    public String toString() {
+        return "DataBinding:" + source.toString() + "->" + target.toString();
     }
 
 }

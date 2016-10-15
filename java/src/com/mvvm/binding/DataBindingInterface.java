@@ -1,14 +1,13 @@
 package com.mvvm.binding;
 
-import com.mvvm.model.Model;
-import com.mvvm.notify.INotifyValueChanged;
+import com.mvvm.notify.IPropertyChangedSupport;
 
 /**
  * 数据绑定接口。
  *
  * @param <T>
  */
-interface DataBindingInterface<T> extends INotifyValueChanged<T> {
+interface DataBindingInterface<T> {
 
     /**
      * 获取数据绑定的类型
@@ -18,38 +17,38 @@ interface DataBindingInterface<T> extends INotifyValueChanged<T> {
     /**
      * 设置数据绑定的类型
      */
-    DataBindingInterface<T> setType(BindingType type);
+    void setType(BindingType type);
 
     /**
-     * 修改源绑定对象的值
-     *
-     * @throws IllegalAccessException 单向绑定时调用此方法会抛出该异常。
+     * 获取源绑定对象，要求实现 IPropertyChangedSupport 接口。
      */
-    void setSourceValue(T value) throws IllegalAccessException;
-
-    /**
-     * 修改目标绑定对象的值
-     */
-    void setTargetValue(T value);
-
-    /**
-     * 获取源绑定对象
-     */
-    Model<T> getSource();
+    IPropertyChangedSupport getSource();
 
     /**
      * 设置源绑定对象
+     *
+     * @param source 源绑定对象，要求实现 IPropertyChangedSupport 接口。
      */
-    DataBindingInterface<T> setSource(Model<T> source);
+    void setSource(IPropertyChangedSupport source);
 
     /**
-     * 获取目标绑定对象
+     * 获取源绑定对象的绑定属性
      */
-    Model<T> getTarget();
+    String getSourcePropertyName();
 
     /**
-     * 设置目标绑定对象
+     * 设置源绑定对象的绑定属性
      */
-    DataBindingInterface<T> setTarget(Model<T> target);
+    void setSourcePropertyName(String propertyName);
+
+    /**
+     * 获取目标绑定对象，必须是 DependencyObject 对象。
+     */
+    DependencyObject<T> getTarget();
+
+    /**
+     * 设置目标绑定对象，必须是 DependencyObject 对象。
+     */
+    void setTarget(DependencyObject<T> target);
 
 }

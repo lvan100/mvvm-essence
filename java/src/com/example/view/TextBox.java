@@ -1,9 +1,10 @@
 package com.example.view;
 
-import com.mvvm.binding.BindingType;
 import com.mvvm.binding.DataBinding;
+import com.mvvm.binding.DependencyObject;
 import com.mvvm.model.Model;
-import com.mvvm.notify.OnValueChanged;
+import com.mvvm.notify.EmptyPropertyChangedSupport;
+import com.mvvm.notify.IPropertyChangedSupport;
 import com.mvvm.view.AbstractView;
 import com.mvvm.view.Command;
 
@@ -17,23 +18,25 @@ public class TextBox extends AbstractView {
     /**
      * 文本数据模型
      */
-    private Model<String> textValue = new Model<String>("");
+    private DependencyObject<String> textValue = new DependencyObject<>("");
 
     {
         // 文本内容的更新应该肯定会引起控件界面的刷新 //
-        textValue.addValueChanged(new OnValueChanged<String>() {
+        textValue.getPropertyChangedHandler().addPropertyChangedNotify(
+                textValue.valueProperty, new EmptyPropertyChangedSupport() {
 
-            @Override
-            public void onValueChanged(String newValue) {
+                    @Override
+                    public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
+                        System.out.println(getId() + ":onPropertyChanged");
 
-                if (textValueChanged != null) {
-                    textValueChanged.onCommand(TextBox.this);
-                }
+                        if (textValueChanged != null) {
+                            textValueChanged.onCommand(TextBox.this);
+                        }
 
-                show();
-            }
+                        show();
+                    }
 
-        });
+                });
     }
 
     public TextBox(String id) {
@@ -53,12 +56,7 @@ public class TextBox extends AbstractView {
      */
     public void setText(String value) {
         System.out.println(getId() + ":setText");
-
-        try {
-            textValue.setValue(value);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        textValue.setValue(value);
     }
 
     /**
@@ -67,38 +65,11 @@ public class TextBox extends AbstractView {
     public void setDataBinding(String propertyName, DataBinding<?> binding) {
 
         if (textProperty.equals(propertyName)) {
-
-            DataBinding<String> bd = (DataBinding<String>) binding;
-            bd.setTarget(textValue);
-
-            binding.getSource().addValueChanged(new OnValueChanged<String>() {
-
-                @Override
-                public void onValueChanged(String newValue) {
-                    bd.setTargetValue(newValue);
-                }
-
-            });
-
-            if (binding.getType() == BindingType.TwoWay) {
-
-                textValue.addValueChanged(new OnValueChanged<String>() {
-
-                    @Override
-                    public void onValueChanged(String newValue) {
-                        try {
-                            bd.setSourceValue(newValue);
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                });
-            }
-
-            // 刷新源数据 //
-            binding.getSource().refresh();
+            ((DataBinding<String>) binding).setTarget(textValue);
         }
+
+        // 完成数据绑定组装
+        binding.build();
     }
 
     /**
@@ -115,8 +86,7 @@ public class TextBox extends AbstractView {
 
     @Override
     public void show() {
-        System.out.println(getId() + ":show");
-        System.out.println(getId() + ":textValue=" + getText().getValue());
+        System.out.println(getId() + ":show[textValue=" + textValue.getValue() + "]");
     }
 
 }
