@@ -5,6 +5,8 @@ import com.example.view.StudentView;
 import com.mvvm.binding.BindingType;
 import com.mvvm.binding.DataBinding;
 import com.mvvm.binding.ValueConverter;
+import com.mvvm.model.Model;
+import com.mvvm.view.TextBox;
 
 import static com.print.PrintHelper.PRINT_HELPER;
 
@@ -38,8 +40,9 @@ public class StudentViewModel {
 
         PRINT_HELPER.enterPrint("studentView.textBoxStudentName.setDataBinding.begin");
 
-        studentView.textBoxStudentName.textValue.setDataBinding(
-                new DataBinding<String>(BindingType.OneWay, student.nameValue));
+        studentView.textBoxStudentName.setDataBinding(
+                TextBox.textProperty, new DataBinding<String>(
+                        BindingType.OneWay, student, Student.nameProperty));
 
         PRINT_HELPER.exitPrint("studentView.textBoxStudentName.setDataBinding.end");
         System.out.println();
@@ -62,7 +65,7 @@ public class StudentViewModel {
         PRINT_HELPER.enterPrint("studentView.textBoxStudentScore.setDataBinding.begin");
 
         DataBinding<String> binding = new DataBinding<>(
-                BindingType.TwoWay, student.scoreValue);
+                BindingType.TwoWay, student, Student.scoreProperty);
 
         binding.setValueConverter(new ValueConverter<String>() {
 
@@ -78,7 +81,8 @@ public class StudentViewModel {
 
         });
 
-        studentView.textBoxStudentScore.textValue.setDataBinding(binding);
+        studentView.textBoxStudentScore.setDataBinding(
+                TextBox.textProperty, binding);
 
         PRINT_HELPER.exitPrint("studentView.textBoxStudentScore.setDataBinding.end");
         System.out.println();
@@ -100,8 +104,9 @@ public class StudentViewModel {
 
         PRINT_HELPER.enterPrint("studentView.textBoxStudentLevel.setDataBinding.begin");
 
-        binding = new DataBinding<>(BindingType.OneWay,
-                studentView.textBoxStudentScore.textValue);
+        binding = new DataBinding<>(
+                BindingType.OneWay, studentView.textBoxStudentScore.getText()
+                , Model.valueProperty);
 
         binding.setValueConverter(new ValueConverter<String>() {
 
@@ -118,7 +123,8 @@ public class StudentViewModel {
 
         });
 
-        studentView.textBoxStudentLevel.textValue.setDataBinding(binding);
+        studentView.textBoxStudentLevel.setDataBinding(
+                TextBox.textProperty, binding);
 
         PRINT_HELPER.exitPrint("studentView.textBoxStudentLevel.setDataBinding.end");
         System.out.println();

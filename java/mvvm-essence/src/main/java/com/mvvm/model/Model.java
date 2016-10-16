@@ -1,14 +1,16 @@
 package com.mvvm.model;
 
-import com.mvvm.notify.IPropertyChangedSupport;
-import com.mvvm.notify.PropertyChangedHandler;
+import com.mvvm.binding.DataBinding;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.print.PrintHelper.PRINT_HELPER;
 
 /**
- * 数据模型的实现
+ * 标准数据模型
  */
-public class Model<T> extends PropertyChangedHandler implements ModelInterface<T> {
+public class Model<T> implements BindableModel<T> {
 
     /**
      * 客户端值
@@ -18,12 +20,12 @@ public class Model<T> extends PropertyChangedHandler implements ModelInterface<T
     /**
      * 是否只能读取
      */
-    private boolean readOnly = false;
+    private boolean readOnly;
 
     /**
-     * 客户端值的属性名称
+     * 数据绑定对象
      */
-    public static final String valueProperty = "value";
+    private DataBinding<T> dataBinding;
 
     public Model(T value) {
         this.value = value;
@@ -36,81 +38,123 @@ public class Model<T> extends PropertyChangedHandler implements ModelInterface<T
 
     @Override
     public T getValue() {
-        PRINT_HELPER.print(this.toString() + ":Model.getValue=" + value);
-        return value;
-    }
-
-    @Override
-    public void setValue(T value) {
-        if (!isReadOnly()) {
-
-            PRINT_HELPER.print(this.toString() + ":Model.setValue="
-                    + this.value + "->" + value);
-            this.value = value;
-
-            PRINT_HELPER.enterPrint(this.toString()
-                    + ":Model.notifyPropertyChanged.begin");
-
-            // 通知其值已经发生变化
-            notifyPropertyChanged(null, this, valueProperty);
-
-            PRINT_HELPER.exitPrint(this.toString()
-                    + ":Model.notifyPropertyChanged.end");
+        PRINT_HELPER.print(this.toString() + ":Model.getValue");
+        if (dataBinding == null) {
+            return value;
+        } else {
+            return dataBinding.getSourceValue();
         }
     }
 
     @Override
+    public void setValue(Object value) {
+        PRINT_HELPER.enterPrint(this.toString() + ":Model.setValue.begin");
+        {
+            if (dataBinding == null) {
+                if (!isReadOnly()) {
+
+                    PRINT_HELPER.print(this.toString() + ":Model.setValue="
+                            + this.value + "->" + value);
+                    this.value = (T) value;
+
+                    PRINT_HELPER.enterPrint(this.toString()
+                            + ":Model.notifyModelChanged.begin");
+
+                    // 通知其值已经发生变化
+                    notifyModelChanged(null, this);
+
+                    PRINT_HELPER.exitPrint(this.toString()
+                            + ":Model.notifyModelChanged.end");
+                }
+
+            } else {
+                dataBinding.setSourceValue((T) value);
+            }
+        }
+        PRINT_HELPER.exitPrint(this.toString() + ":Model.setValue.end");
+    }
+
     public boolean isReadOnly() {
         return readOnly;
     }
 
-    @Override
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
     }
 
+    /**
+     * 获取数据绑定对象
+     */
+    public DataBinding<T> getDataBinding() {
+        return dataBinding;
+    }
+
+    /**
+     * 设置数据绑定对象
+     */
+    public void setDataBinding(DataBinding<T> dataBinding) {
+        this.dataBinding = dataBinding;
+        dataBinding.setTarget(this);
+        dataBinding.build();
+    }
+
+    /**
+     * 已绑定的数据模型列表
+     */
+    private List<BindableModel> bondedModelList = new ArrayList<>();
+
     @Override
-    public Object getProperty(String propertyName) {
-        PRINT_HELPER.print(this.toString() + ":Model.getProperty[\"" + propertyName + "\"]");
-        if (valueProperty.equals(propertyName)) {
-            return getValue(); // 子类可能会覆盖 getValue() 函数
+    public void bindModel(BindableModel model) {
+        bondedModelList.add(model);
+    }
+
+    @Override
+    public void unbindModel(BindableModel model) {
+        bondedModelList.remove(model);
+    }
+
+    @Override
+    public void onValueChanged(BindableModel source) {
+        PRINT_HELPER.enterPrint(this.toString() + ":Model.onValueChanged");
+
+        if (dataBinding == null) {
+            if (!isReadOnly()) {
+                T newValue = dataBinding.getSourceValue();
+                PRINT_HELPER.print(this.toString() + ":Model.value="
+                        + this.value + "->" + newValue);
+                this.value = newValue;
+            }
         }
-        return null;
+
+        PRINT_HELPER.print(this.toString() +
+                ":Model.notifyModelChanged.begin");
+
+        // 通知其值已经发生变化
+        notifyModelChanged(source, this);
+
+        PRINT_HELPER.exitPrint(this.toString() +
+                ":Model.notifyModelChanged.end");
     }
 
-    @Override
-    public void setProperty(String propertyName, Object value) {
-        PRINT_HELPER.print(this.toString() + ":Model.setProperty[\"" + propertyName + "\"]");
-        if (valueProperty.equals(propertyName)) {
-            setValue((T) value);
-        }
-    }
+    /**
+     * 通知数据模型的值变化事件
+     */
+    public void notifyModelChanged(BindableModel exclude, BindableModel source) {
+        for (BindableModel model : bondedModelList) {
+            PRINT_HELPER.enterPrint(model.toString() +
+                    ":Model.onValueChanged.begin");
+            {
+                if (model != exclude) {
+                    model.onValueChanged(source);
 
-    @Override
-    public PropertyChangedHandler getPropertyChangedHandler() {
-        return this;
-    }
-
-    @Override
-    public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
-        PRINT_HELPER.enterPrint(this.toString() + ":Model.onPropertyChanged");
-        if (!isReadOnly()) {
-
-            T newValue = (T) eventSource.getProperty(propertyName);
-            PRINT_HELPER.print(this.toString() + ":Model.value="
-                    + this.value + "->" + newValue);
-            this.value = newValue;
-
-            PRINT_HELPER.print(this.toString()
-                    + ":Model.notifyPropertyChanged.begin");
-
-            // 通知其值已经发生变化
-            notifyPropertyChanged(eventSource, this, valueProperty);
-
-            PRINT_HELPER.exitPrint(this.toString()
-                    + ":Model.notifyPropertyChanged.end");
-        } else {
-            PRINT_HELPER.exit();
+                } else {
+                    PRINT_HELPER.enterPrint(model.toString() +
+                            ":Model.onValueChanged.skip");
+                    PRINT_HELPER.exit();
+                }
+            }
+            PRINT_HELPER.exitPrint(model.toString() +
+                    ":Model.onValueChanged.end");
         }
     }
 

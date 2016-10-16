@@ -1,79 +1,59 @@
 package com.mvvm.binding;
 
-import com.mvvm.notify.IPropertyChangedSupport;
+import com.mvvm.model.Model;
 
 import static com.print.PrintHelper.PRINT_HELPER;
 
 /**
- * 数据绑定的实现。
- *
- * @param <T>
+ * 数据绑定
  */
-public class DataBinding<T> implements DataBindingInterface<T> {
+public class DataBinding<T> {
 
     /**
-     * 绑定类型
+     * 源绑定对象
      */
-    private BindingType type;
+    private Model source;
 
     /**
      * 目标绑定对象
      */
-    private DependencyObject<T> target;
+    private Model<T> target;
 
     /**
-     * 源绑定对象及其绑定属性
+     * 数据绑定的类型
      */
-    private String sourcePropertyName;
-    private IPropertyChangedSupport source;
+    private BindingType type = BindingType.TwoWay;
 
     public DataBinding(BindingType type) {
         this.type = type;
     }
 
-    public DataBinding(BindingType type, IPropertyChangedSupport source, String sourcePropertyName) {
-        this.sourcePropertyName = sourcePropertyName;
+    public DataBinding(BindingType type, Model source) {
         this.source = source;
         this.type = type;
     }
 
-    @Override
     public BindingType getType() {
         return type;
     }
 
-    @Override
     public void setType(BindingType type) {
         this.type = type;
     }
 
-    @Override
-    public IPropertyChangedSupport getSource() {
+    public Model getSource() {
         return source;
     }
 
-    @Override
-    public void setSource(IPropertyChangedSupport source) {
+    public void setSource(Model source) {
         this.source = source;
     }
 
-    @Override
-    public String getSourcePropertyName() {
-        return sourcePropertyName;
-    }
-
-    @Override
-    public void setSourcePropertyName(String propertyName) {
-        this.sourcePropertyName = propertyName;
-    }
-
-    @Override
-    public DependencyObject<T> getTarget() {
+    public Model<T> getTarget() {
         return target;
     }
 
-    @Override
-    public void setTarget(DependencyObject<T> target) {
+    public void setTarget(Model<T> target) {
         this.target = target;
     }
 
@@ -83,28 +63,29 @@ public class DataBinding<T> implements DataBindingInterface<T> {
     private ValueConverter<T> converter = new ValueConverter<T>() {
     };
 
-    @Override
+    /**
+     * 设置值转换器
+     */
     public void setValueConverter(ValueConverter<T> converter) {
         this.converter = converter;
     }
 
     /**
-     * 获取源绑定对象的属性值
+     * 获取源绑定对象的值
      */
-    T getSourceValue() {
+    public T getSourceValue() {
         PRINT_HELPER.print(this.toString() + ":getSourceValue");
-        return converter.convert(source.getProperty(sourcePropertyName));
+        return converter.convert(source.getValue());
     }
 
     /**
-     * 设置源绑定对象的属性值
+     * 设置源绑定对象的值
      */
-    void setSourceValue(T newValue) {
+    public void setSourceValue(T newValue) {
         PRINT_HELPER.enterPrint(this.toString() + ":setSourceValue.begin");
         {
             if (getType() == BindingType.TwoWay) {
-                source.setProperty(sourcePropertyName,
-                        converter.reverseConvert(newValue));
+                source.setValue(converter.reverseConvert(newValue));
             }
         }
         PRINT_HELPER.exitPrint(this.toString() + ":setSourceValue.end");
@@ -115,29 +96,21 @@ public class DataBinding<T> implements DataBindingInterface<T> {
      */
     public void build() {
 
-        target.setDataBinding(this);
-
-        source.getPropertyChangedHandler()
-                .addPropertyChangedNotify(sourcePropertyName, target);
+        source.bindModel(target);
 
         if (getType() == BindingType.TwoWay) {
-            target.getPropertyChangedHandler()
-                    .addPropertyChangedNotify(DependencyObject.valueProperty, source);
+            target.bindModel(source);
         }
 
-        PRINT_HELPER.enterPrint(this.toString() + ":build.begin");
+        PRINT_HELPER.enterPrint(source.toString() + ":notifyModelChanged.begin");
 
-        if (source instanceof DependencyObject) {
-            DependencyObject dependencyObj = (DependencyObject) source;
-            dependencyObj.getPropertyChangedHandler().notifyPropertyChanged(
-                    dependencyObj.getDataBinding().getSource(), source, sourcePropertyName);
-
+        if (source.getDataBinding() != null) {
+            source.notifyModelChanged(source.getDataBinding().getSource(), source);
         } else {
-            source.getPropertyChangedHandler()
-                    .notifyPropertyChanged(null, source, sourcePropertyName);
+            source.notifyModelChanged(null, source);
         }
 
-        PRINT_HELPER.exitPrint(this.toString() + ":build.end");
+        PRINT_HELPER.exitPrint(source.toString() + ":notifyModelChanged.end");
     }
 
     @Override

@@ -1,9 +1,8 @@
 package com.mvvm.view;
 
-import com.mvvm.binding.DataBinding;
-import com.mvvm.binding.DependencyObject;
-import com.mvvm.notify.EmptyPropertyChangedSupport;
-import com.mvvm.notify.IPropertyChangedSupport;
+import com.mvvm.model.BindableModel;
+import com.mvvm.model.EmptyModel;
+import com.mvvm.model.Model;
 
 import static com.print.PrintHelper.PRINT_HELPER;
 
@@ -12,66 +11,45 @@ import static com.print.PrintHelper.PRINT_HELPER;
  */
 public class TextBox extends AbstractView {
 
-    public static final String textProperty = "textValue";
-
     /**
-     * 文本数据依赖对象
+     * 输入框文本数据模型
      */
-    private DependencyObject<String> textValue = new DependencyObject<>("");
+    public final Model<String> textValue = new Model<>("");
 
     {
         // 更新文本内容会引起界面的刷新
-        textValue.getPropertyChangedHandler().addPropertyChangedNotify(
-                DependencyObject.valueProperty, new EmptyPropertyChangedSupport() {
+        textValue.bindModel(new EmptyModel() {
 
-                    @Override
-                    public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
-                        PRINT_HELPER.enterPrint(getId() + ":onPropertyChanged");
+            @Override
+            public void onValueChanged(BindableModel eventSource) {
+                PRINT_HELPER.enterPrint(getId() + ":onValueChanged");
 
-                        if (textValueChanged != null) {
-                            textValueChanged.onCommand(TextBox.this);
-                        }
+                if (textValueChanged != null) {
+                    textValueChanged.onCommand(TextBox.this);
+                }
 
-                        show();
+                show();
 
-                        PRINT_HELPER.exit();
-                    }
+                PRINT_HELPER.exit();
+            }
 
-                });
+        });
     }
 
     public TextBox(String id) {
         setId(id);
     }
 
-    /**
-     * 获取文本内容依赖对象
-     */
-    public DependencyObject<String> getText() {
-        PRINT_HELPER.print(getId() + ":getText");
-        return textValue;
+    public String getText() {
+        return textValue.getValue();
     }
 
-    /**
-     * 设置文本内容
-     */
     public void setText(String value) {
         PRINT_HELPER.enterPrint(getId() + ":setText.begin");
-        textValue.setValue(value);
-        PRINT_HELPER.exitPrint(getId() + ":setText.end");
-    }
-
-    /**
-     * 为属性设置数据绑定。
-     */
-    public void setDataBinding(String propertyName, DataBinding<?> binding) {
-
-        if (textProperty.equals(propertyName)) {
-            ((DataBinding<String>) binding).setTarget(textValue);
+        {
+            textValue.setValue(value);
         }
-
-        // 完成数据绑定组装
-        binding.build();
+        PRINT_HELPER.exitPrint(getId() + ":setText.end");
     }
 
     /**
