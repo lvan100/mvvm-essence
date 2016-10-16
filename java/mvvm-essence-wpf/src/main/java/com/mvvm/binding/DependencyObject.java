@@ -57,51 +57,23 @@ public class DependencyObject<T> extends Model<T> {
                 super.setValue(value);
             } else {
                 dataBinding.setSourceValue(value);
-
-                PRINT_HELPER.enterPrint(this.toString()
-                        + ":DependencyObject.notifyPropertyChanged.begin");
-
-                // 通知其值已经发生变化
-                notifyPropertyChanged(dataBinding.getSource(), this, valueProperty);
-
-                PRINT_HELPER.exitPrint(this.toString()
-                        + ":DependencyObject.notifyPropertyChanged.end");
             }
         }
         PRINT_HELPER.exitPrint(this.toString() + ":DependencyObject.setValue.end");
     }
 
     @Override
-    public void setProperty(String propertyName, Object value) {
-        PRINT_HELPER.print(this.toString() + ":DependencyObject.setProperty[\"" + propertyName + "\"]");
-        if (dataBinding == null) {
-            super.setProperty(propertyName, value);
-
-        } else {
-            if (valueProperty.equals(propertyName)) {
-                dataBinding.setSourceValue((T) value);
-            }
-        }
-    }
-
-    @Override
     public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
         PRINT_HELPER.enterPrint(this.toString() + ":DependencyObject.onPropertyChanged");
-        if (dataBinding == null) {
-            super.onPropertyChanged(eventSource, propertyName);
-            PRINT_HELPER.exit();
 
-        } else {
+        PRINT_HELPER.print(this.toString() +
+                ":DependencyObject.notifyPropertyChanged.begin");
 
-            PRINT_HELPER.print(this.toString() +
-                    ":DependencyObject.notifyPropertyChanged.begin");
+        // 通知其值已经发生变化
+        notifyPropertyChanged(this, valueProperty);
 
-            // 通知其值已经发生变化
-            notifyPropertyChanged(eventSource, this, valueProperty);
-
-            PRINT_HELPER.exitPrint(this.toString() +
-                    ":DependencyObject.notifyPropertyChanged.end");
-        }
+        PRINT_HELPER.exitPrint(this.toString() +
+                ":DependencyObject.notifyPropertyChanged.end");
     }
 
 }

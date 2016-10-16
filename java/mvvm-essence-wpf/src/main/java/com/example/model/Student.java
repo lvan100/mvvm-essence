@@ -26,7 +26,7 @@ public class Student implements IPropertyChangedSupport {
 
             PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
             {
-                handler.notifyPropertyChanged(null, this, nameProperty);
+                handler.notifyPropertyChanged(this, nameProperty);
             }
             PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
         }
@@ -49,7 +49,7 @@ public class Student implements IPropertyChangedSupport {
 
             PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
             {
-                handler.notifyPropertyChanged(null, this, scoreProperty);
+                handler.notifyPropertyChanged(this, scoreProperty);
             }
             PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
         }
@@ -82,6 +82,12 @@ public class Student implements IPropertyChangedSupport {
         if (scoreProperty.equals(propertyName)) {
             score = (Integer) value;
         }
+
+        PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
+        {
+            handler.notifyPropertyChanged(this, propertyName);
+        }
+        PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
     }
 
     /**

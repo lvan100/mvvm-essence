@@ -20,25 +20,17 @@ public class PropertyChangedHandler {
     /**
      * 通知属性值变化事件
      *
-     * @param exclude      被排除的通知对象，要求实现 IPropertyChangedSupport 接口。
      * @param source       属性发生变化的对象，要求实现 IPropertyChangedSupport 接口。
      * @param propertyName 发生变化的属性名称
      */
-    public void notifyPropertyChanged(IPropertyChangedSupport exclude, IPropertyChangedSupport source, String propertyName) {
+    public void notifyPropertyChanged(IPropertyChangedSupport source, String propertyName) {
         List<IPropertyChangedSupport> notifyList = propertyChangedMap.get(propertyName);
         if (notifyList != null) {
             for (IPropertyChangedSupport notify : notifyList) {
                 PRINT_HELPER.enterPrint(this.toString() +
                         ":PropertyChangedHandler.onPropertyChanged.begin");
                 {
-                    if (notify != exclude) {
-                        notify.onPropertyChanged(source, propertyName);
-                    } else {
-
-                        PRINT_HELPER.enterPrint(this.toString() +
-                                ":PropertyChangedHandler.onPropertyChanged.skip");
-                        PRINT_HELPER.exit();
-                    }
+                    notify.onPropertyChanged(source, propertyName);
                 }
                 PRINT_HELPER.exitPrint(this.toString() +
                         ":PropertyChangedHandler.onPropertyChanged.end");

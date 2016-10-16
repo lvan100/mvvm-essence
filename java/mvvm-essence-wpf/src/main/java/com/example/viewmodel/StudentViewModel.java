@@ -5,7 +5,6 @@ import com.example.view.StudentView;
 import com.mvvm.binding.BindingType;
 import com.mvvm.binding.DataBinding;
 import com.mvvm.binding.ValueConverter;
-import com.mvvm.model.Model;
 import com.mvvm.view.TextBox;
 
 import static com.print.PrintHelper.PRINT_HELPER;
@@ -104,9 +103,8 @@ public class StudentViewModel {
 
         PRINT_HELPER.enterPrint("studentView.textBoxStudentLevel.setDataBinding.begin");
 
-        binding = new DataBinding<>(
-                BindingType.OneWay, studentView.textBoxStudentScore.getText()
-                , Model.valueProperty);
+        binding = new DataBinding<>(BindingType.OneWay,
+                studentView.textBoxStudentScore.getText());
 
         binding.setValueConverter(new ValueConverter<String>() {
 

@@ -31,6 +31,12 @@ public class DataBinding<T> implements DataBindingInterface<T> {
         this.type = type;
     }
 
+    public DataBinding(BindingType type, DependencyObject source) {
+        this.sourcePropertyName = DependencyObject.valueProperty;
+        this.source = source;
+        this.type = type;
+    }
+
     public DataBinding(BindingType type, IPropertyChangedSupport source, String sourcePropertyName) {
         this.sourcePropertyName = sourcePropertyName;
         this.source = source;
@@ -120,22 +126,10 @@ public class DataBinding<T> implements DataBindingInterface<T> {
         source.getPropertyChangedHandler()
                 .addPropertyChangedNotify(sourcePropertyName, target);
 
-        if (getType() == BindingType.TwoWay) {
-            target.getPropertyChangedHandler()
-                    .addPropertyChangedNotify(DependencyObject.valueProperty, source);
-        }
-
         PRINT_HELPER.enterPrint(this.toString() + ":build.begin");
 
-        if (source instanceof DependencyObject) {
-            DependencyObject dependencyObj = (DependencyObject) source;
-            dependencyObj.getPropertyChangedHandler().notifyPropertyChanged(
-                    dependencyObj.getDataBinding().getSource(), source, sourcePropertyName);
-
-        } else {
-            source.getPropertyChangedHandler()
-                    .notifyPropertyChanged(null, source, sourcePropertyName);
-        }
+        source.getPropertyChangedHandler()
+                .notifyPropertyChanged(source, sourcePropertyName);
 
         PRINT_HELPER.exitPrint(this.toString() + ":build.end");
     }

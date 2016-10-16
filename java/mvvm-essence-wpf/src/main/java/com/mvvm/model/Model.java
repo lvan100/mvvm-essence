@@ -1,6 +1,5 @@
 package com.mvvm.model;
 
-import com.mvvm.notify.IPropertyChangedSupport;
 import com.mvvm.notify.PropertyChangedHandler;
 
 import static com.print.PrintHelper.PRINT_HELPER;
@@ -52,7 +51,7 @@ public class Model<T> extends PropertyChangedHandler implements ModelInterface<T
                     + ":Model.notifyPropertyChanged.begin");
 
             // 通知其值已经发生变化
-            notifyPropertyChanged(null, this, valueProperty);
+            notifyPropertyChanged(this, valueProperty);
 
             PRINT_HELPER.exitPrint(this.toString()
                     + ":Model.notifyPropertyChanged.end");
@@ -80,38 +79,11 @@ public class Model<T> extends PropertyChangedHandler implements ModelInterface<T
 
     @Override
     public void setProperty(String propertyName, Object value) {
-        PRINT_HELPER.print(this.toString() + ":Model.setProperty[\"" + propertyName + "\"]");
-        if (valueProperty.equals(propertyName)) {
-            setValue((T) value);
-        }
     }
 
     @Override
     public PropertyChangedHandler getPropertyChangedHandler() {
         return this;
-    }
-
-    @Override
-    public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
-        PRINT_HELPER.enterPrint(this.toString() + ":Model.onPropertyChanged");
-        if (!isReadOnly()) {
-
-            T newValue = (T) eventSource.getProperty(propertyName);
-            PRINT_HELPER.print(this.toString() + ":Model.value="
-                    + this.value + "->" + newValue);
-            this.value = newValue;
-
-            PRINT_HELPER.print(this.toString()
-                    + ":Model.notifyPropertyChanged.begin");
-
-            // 通知其值已经发生变化
-            notifyPropertyChanged(eventSource, this, valueProperty);
-
-            PRINT_HELPER.exitPrint(this.toString()
-                    + ":Model.notifyPropertyChanged.end");
-        } else {
-            PRINT_HELPER.exit();
-        }
     }
 
 }
