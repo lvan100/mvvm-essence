@@ -1,5 +1,4 @@
 # mvvm-essence
-通过使用Java语言实现的DEMO展示MVVM设计模式的精髓！
 
 当前对于数据绑定的实现有两个版本：一个版本是类WPF模式，另一种是纯Model模式。WPF将绑定源称为Model，而将绑定目标称为DependencyObject，这在一定程度上掩盖了数据绑定背后实现的机制，实际上WPF中的Model和DependencyObject应该是同源的，所以基于此论断发展出了纯Model模式。在纯Model模式中，所有的Model都是可绑定的，这样就将WPF中的Model和DependencyObject合并成为一个概念——BindableModel，可绑定的Model。事实上在下面的示例比较中你会发现，第二种实现要比第一种简单太多。
 
