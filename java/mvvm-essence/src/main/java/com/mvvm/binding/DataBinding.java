@@ -98,18 +98,10 @@ public class DataBinding<T> {
 
         source.bindModel(target);
 
-        if (getType() == BindingType.TwoWay) {
-            target.bindModel(source);
-        }
-
         PRINT_HELPER.enterPrint(source.toString() + ":notifyModelChanged.begin");
-
-        if (source.getDataBinding() != null) {
-            source.notifyModelChanged(source.getDataBinding().getSource(), source);
-        } else {
-            source.notifyModelChanged(null, source);
+        {
+            source.notifyModelChanged();
         }
-
         PRINT_HELPER.exitPrint(source.toString() + ":notifyModelChanged.end");
     }
 

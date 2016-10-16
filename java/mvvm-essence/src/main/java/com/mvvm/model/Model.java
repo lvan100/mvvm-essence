@@ -48,30 +48,33 @@ public class Model<T> implements BindableModel<T> {
 
     @Override
     public void setValue(Object value) {
-        PRINT_HELPER.enterPrint(this.toString() + ":Model.setValue.begin");
-        {
-            if (dataBinding == null) {
-                if (!isReadOnly()) {
+        if (dataBinding == null) {
+            if (!isReadOnly()) {
 
-                    PRINT_HELPER.print(this.toString() + ":Model.setValue="
+                PRINT_HELPER.enterPrint(this.toString() + ":Model.setValue.begin");
+                {
+                    PRINT_HELPER.enterPrint(this.toString() + ":Model.setValue="
                             + this.value + "->" + value);
                     this.value = (T) value;
-
-                    PRINT_HELPER.enterPrint(this.toString()
-                            + ":Model.notifyModelChanged.begin");
-
-                    // 通知其值已经发生变化
-                    notifyModelChanged(null, this);
-
-                    PRINT_HELPER.exitPrint(this.toString()
-                            + ":Model.notifyModelChanged.end");
+                    PRINT_HELPER.exit();
                 }
+                PRINT_HELPER.exitPrint(this.toString() + ":Model.setValue.end");
 
-            } else {
-                dataBinding.setSourceValue((T) value);
+                PRINT_HELPER.enterPrint(this.toString()
+                        + ":Model.notifyModelChanged.begin");
+
+                // 通知其值已经发生变化
+                notifyModelChanged();
+
+                PRINT_HELPER.exitPrint(this.toString()
+                        + ":Model.notifyModelChanged.end");
             }
+
+        } else {
+            PRINT_HELPER.enterPrint(this.toString() + ":Model.setValue.begin");
+            dataBinding.setSourceValue((T) value);
+            PRINT_HELPER.exitPrint(this.toString() + ":Model.setValue.end");
         }
-        PRINT_HELPER.exitPrint(this.toString() + ":Model.setValue.end");
     }
 
     public boolean isReadOnly() {
@@ -117,20 +120,11 @@ public class Model<T> implements BindableModel<T> {
     public void onValueChanged(BindableModel source) {
         PRINT_HELPER.enterPrint(this.toString() + ":Model.onValueChanged");
 
-        if (dataBinding == null) {
-            if (!isReadOnly()) {
-                T newValue = dataBinding.getSourceValue();
-                PRINT_HELPER.print(this.toString() + ":Model.value="
-                        + this.value + "->" + newValue);
-                this.value = newValue;
-            }
-        }
-
         PRINT_HELPER.print(this.toString() +
                 ":Model.notifyModelChanged.begin");
 
         // 通知其值已经发生变化
-        notifyModelChanged(source, this);
+        notifyModelChanged();
 
         PRINT_HELPER.exitPrint(this.toString() +
                 ":Model.notifyModelChanged.end");
@@ -139,19 +133,12 @@ public class Model<T> implements BindableModel<T> {
     /**
      * 通知数据模型的值变化事件
      */
-    public void notifyModelChanged(BindableModel exclude, BindableModel source) {
+    public void notifyModelChanged() {
         for (BindableModel model : bondedModelList) {
             PRINT_HELPER.enterPrint(model.toString() +
                     ":Model.onValueChanged.begin");
             {
-                if (model != exclude) {
-                    model.onValueChanged(source);
-
-                } else {
-                    PRINT_HELPER.enterPrint(model.toString() +
-                            ":Model.onValueChanged.skip");
-                    PRINT_HELPER.exit();
-                }
+                model.onValueChanged(this);
             }
             PRINT_HELPER.exitPrint(model.toString() +
                     ":Model.onValueChanged.end");
