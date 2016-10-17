@@ -91,20 +91,6 @@ public class DataBinding<T> {
         PRINT_HELPER.exitPrint(this.toString() + ":setSourceValue.end");
     }
 
-    /**
-     * 完成数据绑定的组装
-     */
-    public void build() {
-
-        source.bindModel(target);
-
-        PRINT_HELPER.enterPrint(source.toString() + ":notifyModelChanged.begin");
-        {
-            source.notifyModelChanged();
-        }
-        PRINT_HELPER.exitPrint(source.toString() + ":notifyModelChanged.end");
-    }
-
     @Override
     public String toString() {
         return "DataBinding:" + source.toString() + "->" + target.toString();

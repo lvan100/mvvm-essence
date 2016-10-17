@@ -1,7 +1,6 @@
 package com.mvvm.view;
 
-import com.mvvm.model.BindableModel;
-import com.mvvm.model.EmptyModel;
+import com.mvvm.model.INotifyValueChanged;
 import com.mvvm.model.Model;
 
 import static com.print.PrintHelper.PRINT_HELPER;
@@ -18,10 +17,10 @@ public class TextBox extends AbstractView {
 
     {
         // 更新文本内容会引起界面的刷新
-        textValue.bindModel(new EmptyModel() {
+        textValue.addNotifyValueChanged(new INotifyValueChanged() {
 
             @Override
-            public void onValueChanged(BindableModel eventSource) {
+            public void onValueChanged(Model model) {
                 PRINT_HELPER.enterPrint(getId() + ":onValueChanged");
 
                 if (textValueChanged != null) {

@@ -1,7 +1,7 @@
 package com.mvvm.view;
 
 import com.mvvm.binding.DataBinding;
-import com.mvvm.binding.DependencyObject;
+import com.mvvm.model.DependencyObject;
 import com.mvvm.notify.EmptyPropertyChangedSupport;
 import com.mvvm.notify.IPropertyChangedSupport;
 
@@ -17,7 +17,7 @@ public class TextBox extends AbstractView {
     /**
      * 文本数据依赖对象
      */
-    private DependencyObject<String> textValue = new DependencyObject<>("");
+    private final DependencyObject<String> textValue = new DependencyObject<>("");
 
     {
         // 更新文本内容会引起界面的刷新
@@ -65,13 +65,9 @@ public class TextBox extends AbstractView {
      * 为属性设置数据绑定。
      */
     public void setDataBinding(String propertyName, DataBinding<?> binding) {
-
         if (textProperty.equals(propertyName)) {
-            ((DataBinding<String>) binding).setTarget(textValue);
+            textValue.setDataBinding((DataBinding<String>) binding);
         }
-
-        // 完成数据绑定组装
-        binding.build();
     }
 
     /**

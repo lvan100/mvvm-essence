@@ -10,12 +10,12 @@ import static com.print.PrintHelper.PRINT_HELPER;
 /**
  * 属性值变化处理器
  */
-public class PropertyChangedHandler {
+public final class PropertyChangedHandler {
 
     /**
      * 属性值变化通知列表
      */
-    private Map<String, List<IPropertyChangedSupport>> propertyChangedMap = new HashMap<>();
+    private final Map<String, List<IPropertyChangedSupport>> propertyChangedMap = new HashMap<>();
 
     /**
      * 通知属性值变化事件
@@ -32,7 +32,7 @@ public class PropertyChangedHandler {
                 {
                     notify.onPropertyChanged(source, propertyName);
                 }
-                PRINT_HELPER.exitPrint(this.toString() +
+                PRINT_HELPER.exitPrint(notify.toString() +
                         ":PropertyChangedHandler.onPropertyChanged.end");
             }
         }

@@ -14,10 +14,10 @@ import static com.print.PrintHelper.PRINT_HELPER;
 public class StudentViewModel {
 
     // 学生信息
-    public Student student = new Student();
+    public final Student student = new Student();
 
     // 学生信息视图
-    public StudentView studentView = new StudentView("studentView");
+    public final StudentView studentView = new StudentView("studentView");
 
     public StudentViewModel() {
 
@@ -34,12 +34,12 @@ public class StudentViewModel {
         System.out.println();
 
         // 单向绑定学生姓名
-        // student.name -- binding --> studentView.textBoxStudentName --> ...show
+        // student.name --> studentView.textBoxStudentName --> ...show
 
         PRINT_HELPER.enterPrint("studentView.textBoxStudentName.setDataBinding.begin");
 
         studentView.textBoxStudentName.textValue.setDataBinding(
-                new DataBinding<String>(BindingType.OneWay, student.nameValue));
+                new DataBinding<>(BindingType.OneWay, student.nameValue));
 
         PRINT_HELPER.exitPrint("studentView.textBoxStudentName.setDataBinding.end");
         System.out.println();
@@ -57,7 +57,7 @@ public class StudentViewModel {
         System.out.println();
 
         // 双向绑定学生分数
-        // student.score -- binding --> studentView.textBoxStudentScore --> ...show
+        // student.score --> studentView.textBoxStudentScore --> ...show
 
         PRINT_HELPER.enterPrint("studentView.textBoxStudentScore.setDataBinding.begin");
 
@@ -90,13 +90,13 @@ public class StudentViewModel {
         System.out.println();
 
         // 双向绑定修改学生分数
-        // studentView.textBoxStudentScore --> student.score
+        // studentView.textBoxStudentScore --> student.score --> studentView.textBoxStudentScore --> ...show
 
         studentView.textBoxStudentScore.setText("75");
         System.out.println();
 
         // 单向绑定学生成绩水平
-        // studentView.textBoxStudentScore -- binding --> studentView.textBoxStudentLevel --> ...show
+        // studentView.textBoxStudentScore --> studentView.textBoxStudentLevel --> ...show
 
         PRINT_HELPER.enterPrint("studentView.textBoxStudentLevel.setDataBinding.begin");
 
@@ -130,9 +130,37 @@ public class StudentViewModel {
         System.out.println();
 
         // 学生分数和成绩水平单向绑定后修改学生分数
-        // student.score --> studentView.textBoxStudentScore --> studentView.textBoxStudentLevel -->...show
+        // studentView.textBoxStudentScore --> student.score --> studentView.textBoxStudentScore -->
+        // studentView.textBoxStudentLevel -->...show
 
         studentView.textBoxStudentScore.setText("10");
+        System.out.println();
+
+        // 双向绑定学生分数控件和其备份控件
+        // studentView.textBoxStudentScore --> studentView.textBoxStudentLevel -->
+        // studentView.textBoxStudentScoreCopy --> ...show
+
+        PRINT_HELPER.enterPrint("studentView.textBoxStudentScoreCopy.setDataBinding.begin");
+
+        studentView.textBoxStudentScoreCopy.textValue.setDataBinding(new DataBinding<>(
+                BindingType.TwoWay, studentView.textBoxStudentScore.textValue));
+
+        PRINT_HELPER.exitPrint("studentView.textBoxStudentScoreCopy.setDataBinding.end");
+        System.out.println();
+
+        // 学生分数控件和其备份控件双向绑定后修改学生分数
+        // student.score --> studentView.textBoxStudentScore --> studentView.textBoxStudentLevel -->
+        // studentView.textBoxStudentScoreCopy --> ...show
+
+        student.setScore(90);
+        System.out.println();
+
+        // 学生分数控件和其备份控件双向绑定后修改学生分数备份
+        // studentView.textBoxStudentScoreCopy --> studentView.textBoxStudentScore --> student.score -->
+        // studentView.textBoxStudentScore --> studentView.textBoxStudentLevel -->
+        // studentView.textBoxStudentScoreCopy --> ...show
+
+        studentView.textBoxStudentScoreCopy.setText("10");
         System.out.println();
     }
 

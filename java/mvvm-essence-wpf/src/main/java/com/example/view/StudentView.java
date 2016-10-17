@@ -1,7 +1,7 @@
 package com.example.view;
 
 import com.mvvm.binding.DataBinding;
-import com.mvvm.binding.DependencyObject;
+import com.mvvm.model.DependencyObject;
 import com.mvvm.notify.EmptyPropertyChangedSupport;
 import com.mvvm.notify.IPropertyChangedSupport;
 import com.mvvm.view.AbstractView;
@@ -19,7 +19,7 @@ public class StudentView extends AbstractView {
     /**
      * 视图标题依赖对象
      */
-    private DependencyObject<String> titleValue = new DependencyObject<>("myView");
+    private final DependencyObject<String> titleValue = new DependencyObject<>("myView");
 
     {
         // 更新标题会引起界面的刷新
@@ -29,9 +29,9 @@ public class StudentView extends AbstractView {
                     @Override
                     public void onPropertyChanged(IPropertyChangedSupport eventSource, String propertyName) {
                         PRINT_HELPER.enterPrint(getId() + ":onPropertyChanged");
-
-                        show();
-
+                        {
+                            show();
+                        }
                         PRINT_HELPER.exit();
                     }
 
@@ -39,13 +39,16 @@ public class StudentView extends AbstractView {
     }
 
     // 学生姓名
-    public TextBox textBoxStudentName = new TextBox("textBoxStudentName");
+    public final TextBox textBoxStudentName = new TextBox("textBoxStudentName");
 
     // 学生分数
-    public TextBox textBoxStudentScore = new TextBox("textBoxStudentScore");
+    public final TextBox textBoxStudentScore = new TextBox("textBoxStudentScore");
+
+    // 学生分数控件（和 textBoxStudentScore 双向绑定的拷贝控件）
+    public final TextBox textBoxStudentScoreCopy = new TextBox("textBoxStudentScoreCopy");
 
     // 学生评级
-    public TextBox textBoxStudentLevel = new TextBox("textBoxStudentLevel");
+    public final TextBox textBoxStudentLevel = new TextBox("textBoxStudentLevel");
 
     public StudentView(String id) {
         setId(id);
@@ -58,7 +61,9 @@ public class StudentView extends AbstractView {
 
     public void setTitle(String value) {
         PRINT_HELPER.enterPrint(getId() + ":setTitle.begin");
-        titleValue.setValue(value);
+        {
+            titleValue.setValue(value);
+        }
         PRINT_HELPER.exitPrint(getId() + ":setTitle.end");
     }
 
@@ -66,13 +71,9 @@ public class StudentView extends AbstractView {
      * 为属性设置数据绑定。
      */
     public void setDataBinding(String propertyName, DataBinding<?> binding) {
-
         if (titleProperty.equals(propertyName)) {
-            ((DataBinding<String>) binding).setTarget(titleValue);
+            titleValue.setDataBinding((DataBinding<String>) binding);
         }
-
-        // 完成数据绑定组装
-        binding.build();
     }
 
     @Override

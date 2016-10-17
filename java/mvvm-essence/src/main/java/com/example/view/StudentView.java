@@ -1,7 +1,6 @@
 package com.example.view;
 
-import com.mvvm.model.BindableModel;
-import com.mvvm.model.EmptyModel;
+import com.mvvm.model.INotifyValueChanged;
 import com.mvvm.model.Model;
 import com.mvvm.view.AbstractView;
 import com.mvvm.view.TextBox;
@@ -20,10 +19,10 @@ public class StudentView extends AbstractView {
 
     {
         // 更新标题会引起界面的刷新
-        titleValue.bindModel(new EmptyModel() {
+        titleValue.addNotifyValueChanged(new INotifyValueChanged() {
 
             @Override
-            public void onValueChanged(BindableModel eventSource) {
+            public void onValueChanged(Model model) {
                 PRINT_HELPER.enterPrint(getId() + ":onValueChanged");
                 {
                     show();
@@ -39,6 +38,9 @@ public class StudentView extends AbstractView {
 
     // 学生分数控件
     public final TextBox textBoxStudentScore = new TextBox("textBoxStudentScore");
+
+    // 学生分数控件（和 textBoxStudentScore 双向绑定的拷贝控件）
+    public final TextBox textBoxStudentScoreCopy = new TextBox("textBoxStudentScoreCopy");
 
     // 学生评级控件
     public final TextBox textBoxStudentLevel = new TextBox("textBoxStudentLevel");

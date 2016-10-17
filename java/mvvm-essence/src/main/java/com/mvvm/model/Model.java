@@ -10,7 +10,7 @@ import static com.print.PrintHelper.PRINT_HELPER;
 /**
  * 标准数据模型
  */
-public class Model<T> implements BindableModel<T> {
+public final class Model<T> implements INotifyValueChanged {
 
     /**
      * 客户端值
@@ -18,7 +18,7 @@ public class Model<T> implements BindableModel<T> {
     private T value;
 
     /**
-     * 是否只能读取
+     * 是否只读
      */
     private boolean readOnly;
 
@@ -36,7 +36,9 @@ public class Model<T> implements BindableModel<T> {
         this.value = value;
     }
 
-    @Override
+    /**
+     * 获取数据模型的值
+     */
     public T getValue() {
         PRINT_HELPER.print(this.toString() + ":Model.getValue");
         if (dataBinding == null) {
@@ -46,8 +48,10 @@ public class Model<T> implements BindableModel<T> {
         }
     }
 
-    @Override
-    public void setValue(Object value) {
+    /**
+     * 设置数据模型的值
+     */
+    public void setValue(T value) {
         if (dataBinding == null) {
             if (!isReadOnly()) {
 
@@ -55,32 +59,39 @@ public class Model<T> implements BindableModel<T> {
                 {
                     PRINT_HELPER.enterPrint(this.toString() + ":Model.setValue="
                             + this.value + "->" + value);
-                    this.value = (T) value;
+                    this.value = value;
                     PRINT_HELPER.exit();
                 }
                 PRINT_HELPER.exitPrint(this.toString() + ":Model.setValue.end");
 
                 PRINT_HELPER.enterPrint(this.toString()
-                        + ":Model.notifyModelChanged.begin");
-
-                // 通知其值已经发生变化
-                notifyModelChanged();
-
+                        + ":Model.notifyValueChanged.begin");
+                {
+                    notifyValueChanged();
+                }
                 PRINT_HELPER.exitPrint(this.toString()
-                        + ":Model.notifyModelChanged.end");
+                        + ":Model.notifyValueChanged.end");
             }
 
         } else {
             PRINT_HELPER.enterPrint(this.toString() + ":Model.setValue.begin");
-            dataBinding.setSourceValue((T) value);
+            {
+                dataBinding.setSourceValue(value);
+            }
             PRINT_HELPER.exitPrint(this.toString() + ":Model.setValue.end");
         }
     }
 
+    /**
+     * 数据模型是否只读
+     */
     public boolean isReadOnly() {
         return readOnly;
     }
 
+    /**
+     * 设置数据模型是否只读
+     */
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
     }
@@ -96,51 +107,65 @@ public class Model<T> implements BindableModel<T> {
      * 设置数据绑定对象
      */
     public void setDataBinding(DataBinding<T> dataBinding) {
+
+        Model dataSource = dataBinding.getSource();
+        dataSource.addNotifyValueChanged(this);
+
         this.dataBinding = dataBinding;
         dataBinding.setTarget(this);
-        dataBinding.build();
-    }
 
-    /**
-     * 已绑定的数据模型列表
-     */
-    private List<BindableModel> bondedModelList = new ArrayList<>();
-
-    @Override
-    public void bindModel(BindableModel model) {
-        bondedModelList.add(model);
+        PRINT_HELPER.enterPrint(dataSource.toString() +
+                ":notifyValueChanged.begin");
+        {
+            dataSource.notifyValueChanged();
+        }
+        PRINT_HELPER.exitPrint(dataSource.toString() +
+                ":notifyValueChanged.end");
     }
 
     @Override
-    public void unbindModel(BindableModel model) {
-        bondedModelList.remove(model);
-    }
-
-    @Override
-    public void onValueChanged(BindableModel source) {
+    public void onValueChanged(Model model) {
         PRINT_HELPER.enterPrint(this.toString() + ":Model.onValueChanged");
 
         PRINT_HELPER.print(this.toString() +
-                ":Model.notifyModelChanged.begin");
-
-        // 通知其值已经发生变化
-        notifyModelChanged();
-
+                ":Model.notifyValueChanged.begin");
+        {
+            notifyValueChanged();
+        }
         PRINT_HELPER.exitPrint(this.toString() +
-                ":Model.notifyModelChanged.end");
+                ":Model.notifyValueChanged.end");
+    }
+
+    /**
+     * 数据模型值变化通知列表
+     */
+    private final List<INotifyValueChanged> notifyList = new ArrayList<>();
+
+    /**
+     * 添加值变化通知对象
+     */
+    public void addNotifyValueChanged(INotifyValueChanged notify) {
+        notifyList.add(notify);
+    }
+
+    /**
+     * 移除值变化通知对象
+     */
+    public void removeNotifyValueChanged(INotifyValueChanged notify) {
+        notifyList.remove(notify);
     }
 
     /**
      * 通知数据模型的值变化事件
      */
-    public void notifyModelChanged() {
-        for (BindableModel model : bondedModelList) {
-            PRINT_HELPER.enterPrint(model.toString() +
+    private void notifyValueChanged() {
+        for (INotifyValueChanged notify : notifyList) {
+            PRINT_HELPER.enterPrint(notify.toString() +
                     ":Model.onValueChanged.begin");
             {
-                model.onValueChanged(this);
+                notify.onValueChanged(this);
             }
-            PRINT_HELPER.exitPrint(model.toString() +
+            PRINT_HELPER.exitPrint(notify.toString() +
                     ":Model.onValueChanged.end");
         }
     }

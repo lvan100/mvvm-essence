@@ -6,7 +6,7 @@ import com.mvvm.notify.PropertyChangedHandler;
 import static com.print.PrintHelper.PRINT_HELPER;
 
 /**
- * 学生信息，领域模型
+ * 学生信息，数据模型
  */
 public class Student implements IPropertyChangedSupport {
 
@@ -61,11 +61,11 @@ public class Student implements IPropertyChangedSupport {
         PRINT_HELPER.print(this.toString() + ":getProperty[\"" + propertyName + "\"]");
 
         if (nameProperty.equals(propertyName)) {
-            return name;
+            return getName();
         }
 
         if (scoreProperty.equals(propertyName)) {
-            return score;
+            return getScore();
         }
 
         return null;
@@ -76,24 +76,18 @@ public class Student implements IPropertyChangedSupport {
         PRINT_HELPER.print(this.toString() + ":setProperty[\"" + propertyName + "\"]");
 
         if (nameProperty.equals(propertyName)) {
-            name = (String) value;
+            setName((String) value);
         }
 
         if (scoreProperty.equals(propertyName)) {
-            score = (Integer) value;
+            setScore((Integer) value);
         }
-
-        PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
-        {
-            handler.notifyPropertyChanged(this, propertyName);
-        }
-        PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
     }
 
     /**
      * 属性变化处理器
      */
-    private PropertyChangedHandler handler = new PropertyChangedHandler();
+    private final PropertyChangedHandler handler = new PropertyChangedHandler();
 
     @Override
     public PropertyChangedHandler getPropertyChangedHandler() {

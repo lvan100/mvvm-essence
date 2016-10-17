@@ -1,5 +1,6 @@
 package com.mvvm.binding;
 
+import com.mvvm.model.DependencyObject;
 import com.mvvm.notify.IPropertyChangedSupport;
 
 import static com.print.PrintHelper.PRINT_HELPER;
@@ -9,7 +10,7 @@ import static com.print.PrintHelper.PRINT_HELPER;
  *
  * @param <T>
  */
-public class DataBinding<T> implements DataBindingInterface<T> {
+public class DataBinding<T> {
 
     /**
      * 绑定类型
@@ -43,42 +44,34 @@ public class DataBinding<T> implements DataBindingInterface<T> {
         this.type = type;
     }
 
-    @Override
     public BindingType getType() {
         return type;
     }
 
-    @Override
     public void setType(BindingType type) {
         this.type = type;
     }
 
-    @Override
     public IPropertyChangedSupport getSource() {
         return source;
     }
 
-    @Override
     public void setSource(IPropertyChangedSupport source) {
         this.source = source;
     }
 
-    @Override
     public String getSourcePropertyName() {
         return sourcePropertyName;
     }
 
-    @Override
     public void setSourcePropertyName(String propertyName) {
         this.sourcePropertyName = propertyName;
     }
 
-    @Override
     public DependencyObject<T> getTarget() {
         return target;
     }
 
-    @Override
     public void setTarget(DependencyObject<T> target) {
         this.target = target;
     }
@@ -89,7 +82,6 @@ public class DataBinding<T> implements DataBindingInterface<T> {
     private ValueConverter<T> converter = new ValueConverter<T>() {
     };
 
-    @Override
     public void setValueConverter(ValueConverter<T> converter) {
         this.converter = converter;
     }
@@ -97,7 +89,7 @@ public class DataBinding<T> implements DataBindingInterface<T> {
     /**
      * 获取源绑定对象的属性值
      */
-    T getSourceValue() {
+    public T getSourceValue() {
         PRINT_HELPER.print(this.toString() + ":getSourceValue");
         return converter.convert(source.getProperty(sourcePropertyName));
     }
@@ -105,7 +97,7 @@ public class DataBinding<T> implements DataBindingInterface<T> {
     /**
      * 设置源绑定对象的属性值
      */
-    void setSourceValue(T newValue) {
+    public void setSourceValue(T newValue) {
         PRINT_HELPER.enterPrint(this.toString() + ":setSourceValue.begin");
         {
             if (getType() == BindingType.TwoWay) {
@@ -114,24 +106,6 @@ public class DataBinding<T> implements DataBindingInterface<T> {
             }
         }
         PRINT_HELPER.exitPrint(this.toString() + ":setSourceValue.end");
-    }
-
-    /**
-     * 完成数据绑定的组装
-     */
-    public void build() {
-
-        target.setDataBinding(this);
-
-        source.getPropertyChangedHandler()
-                .addPropertyChangedNotify(sourcePropertyName, target);
-
-        PRINT_HELPER.enterPrint(this.toString() + ":build.begin");
-
-        source.getPropertyChangedHandler()
-                .notifyPropertyChanged(source, sourcePropertyName);
-
-        PRINT_HELPER.exitPrint(this.toString() + ":build.end");
     }
 
     @Override
