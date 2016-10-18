@@ -3,6 +3,8 @@ package com.example.model;
 import com.mvvm.notify.IPropertyChangedSupport;
 import com.mvvm.notify.PropertyChangedHandler;
 
+import java.util.Objects;
+
 import static com.print.PrintHelper.PRINT_HELPER;
 
 /**
@@ -22,15 +24,23 @@ public class Student implements IPropertyChangedSupport {
     public void setName(String name) {
         PRINT_HELPER.enterPrint(this.toString() + ":setName.begin");
         {
-            this.name = name;
+            if (Objects.deepEquals(this.name, name)) {
+                PRINT_HELPER.exitPrint(this.toString() + ":setName.end");
 
-            PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
-            {
-                handler.notifyPropertyChanged(this, nameProperty);
+            } else {
+                PRINT_HELPER.print(this.toString() + ":setName="
+                        + this.name + "->" + name);
+
+                this.name = name;
+                PRINT_HELPER.exitPrint(this.toString() + ":setName.end");
+
+                PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
+                {
+                    handler.notifyPropertyChanged(this, nameProperty);
+                }
+                PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
             }
-            PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
         }
-        PRINT_HELPER.exitPrint(this.toString() + ":setName.end");
     }
 
     //学生分数
@@ -45,15 +55,23 @@ public class Student implements IPropertyChangedSupport {
     public void setScore(int score) {
         PRINT_HELPER.enterPrint(this.toString() + ":setScore.begin");
         {
-            this.score = score;
+            if (Objects.deepEquals(this.score, score)) {
+                PRINT_HELPER.exitPrint(this.toString() + ":setScore.end");
 
-            PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
-            {
-                handler.notifyPropertyChanged(this, scoreProperty);
+            } else {
+                PRINT_HELPER.print(this.toString() + ":setScore="
+                        + this.score + "->" + score);
+
+                this.score = score;
+                PRINT_HELPER.exitPrint(this.toString() + ":setScore.end");
+
+                PRINT_HELPER.enterPrint(this.toString() + ":notifyPropertyChanged.begin");
+                {
+                    handler.notifyPropertyChanged(this, scoreProperty);
+                }
+                PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
             }
-            PRINT_HELPER.exitPrint(this.toString() + ":notifyPropertyChanged.end");
         }
-        PRINT_HELPER.exitPrint(this.toString() + ":setScore.end");
     }
 
     @Override

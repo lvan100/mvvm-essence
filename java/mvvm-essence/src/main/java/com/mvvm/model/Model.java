@@ -4,6 +4,7 @@ import com.mvvm.binding.DataBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.print.PrintHelper.PRINT_HELPER;
 
@@ -59,18 +60,26 @@ public final class Model<T> implements INotifyValueChanged {
                 {
                     PRINT_HELPER.enterPrint(this.toString() + ":Model.setValue="
                             + this.value + "->" + value);
-                    this.value = value;
-                    PRINT_HELPER.exit();
-                }
-                PRINT_HELPER.exitPrint(this.toString() + ":Model.setValue.end");
 
-                PRINT_HELPER.enterPrint(this.toString()
-                        + ":Model.notifyValueChanged.begin");
-                {
-                    notifyValueChanged();
+                    if (Objects.deepEquals(this.value, value)) {
+                        PRINT_HELPER.exit();
+                        PRINT_HELPER.exitPrint(this.toString() + ":Model.setValue.end");
+
+                    } else {
+                        this.value = value;
+
+                        PRINT_HELPER.exit();
+                        PRINT_HELPER.exitPrint(this.toString() + ":Model.setValue.end");
+
+                        PRINT_HELPER.enterPrint(this.toString()
+                                + ":Model.notifyValueChanged.begin");
+                        {
+                            notifyValueChanged();
+                        }
+                        PRINT_HELPER.exitPrint(this.toString()
+                                + ":Model.notifyValueChanged.end");
+                    }
                 }
-                PRINT_HELPER.exitPrint(this.toString()
-                        + ":Model.notifyValueChanged.end");
             }
 
         } else {

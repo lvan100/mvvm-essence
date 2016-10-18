@@ -27,6 +27,11 @@ public class StudentViewModel {
         studentView.setTitle("Student");
         System.out.println();
 
+        // 赋相同的值不会引发任何变化
+
+        studentView.setTitle("Student");
+        System.out.println();
+
         // 未绑定前修改学生姓名
         // student.name --> ...
 
@@ -159,6 +164,21 @@ public class StudentViewModel {
         // studentView.textBoxStudentScoreCopy --> studentView.textBoxStudentScore --> student.score -->
         // studentView.textBoxStudentScore --> studentView.textBoxStudentLevel -->
         // studentView.textBoxStudentScoreCopy --> ...show
+
+        studentView.textBoxStudentScoreCopy.setText("10");
+        System.out.println();
+
+        // 赋相同的值不会引发任何变化
+
+        student.setScore(10);
+        System.out.println();
+
+        // 赋相同的值不会引发任何变化
+
+        studentView.textBoxStudentScore.setText("10");
+        System.out.println();
+
+        // 赋相同的值不会引发任何变化
 
         studentView.textBoxStudentScoreCopy.setText("10");
         System.out.println();

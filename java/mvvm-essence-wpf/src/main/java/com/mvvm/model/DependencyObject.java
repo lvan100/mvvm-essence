@@ -4,6 +4,8 @@ import com.mvvm.binding.DataBinding;
 import com.mvvm.notify.IPropertyChangedSupport;
 import com.mvvm.notify.PropertyChangedHandler;
 
+import java.util.Objects;
+
 import static com.print.PrintHelper.PRINT_HELPER;
 
 /**
@@ -57,17 +59,26 @@ public final class DependencyObject<T> implements IPropertyChangedSupport {
                 {
                     PRINT_HELPER.print(this.toString() + ":DependencyObject.setValue="
                             + this.value + "->" + value);
-                    this.value = value;
-                }
-                PRINT_HELPER.exitPrint(this.toString() + ":DependencyObject.setValue.end");
 
-                PRINT_HELPER.enterPrint(this.toString()
-                        + ":DependencyObject.notifyPropertyChanged.begin");
-                {
-                    handler.notifyPropertyChanged(this, valueProperty);
+                    if (Objects.deepEquals(this.value, value)) {
+                        PRINT_HELPER.exit();
+                        PRINT_HELPER.exitPrint(this.toString() + ":DependencyObject.setValue.end");
+
+                    } else {
+                        this.value = value;
+
+                        PRINT_HELPER.exit();
+                        PRINT_HELPER.exitPrint(this.toString() + ":DependencyObject.setValue.end");
+
+                        PRINT_HELPER.enterPrint(this.toString()
+                                + ":DependencyObject.notifyPropertyChanged.begin");
+                        {
+                            handler.notifyPropertyChanged(this, valueProperty);
+                        }
+                        PRINT_HELPER.exitPrint(this.toString()
+                                + ":DependencyObject.notifyPropertyChanged.end");
+                    }
                 }
-                PRINT_HELPER.exitPrint(this.toString()
-                        + ":DependencyObject.notifyPropertyChanged.end");
             }
         } else {
             PRINT_HELPER.enterPrint(this.toString() + ":DependencyObject.setValue.begin");
