@@ -11,7 +11,7 @@ import static com.print.PrintHelper.PRINT_HELPER;
 /**
  * 标准数据模型
  */
-public final class Model<T> implements INotifyValueChanged {
+public class Model<T> implements INotifyValueChanged {
 
     /**
      * 客户端值
@@ -167,7 +167,7 @@ public final class Model<T> implements INotifyValueChanged {
     /**
      * 通知数据模型的值变化事件
      */
-    private void notifyValueChanged() {
+    public void notifyValueChanged() {
         for (INotifyValueChanged notify : notifyList) {
             PRINT_HELPER.enterPrint(notify.toString() +
                     ":Model.onValueChanged.begin");
