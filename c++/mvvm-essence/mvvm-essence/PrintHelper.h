@@ -1,48 +1,34 @@
 #pragma once
 
 #include <string>
-#include <memory>
 #include <iostream>
 using namespace std;
 
-class PrintHelper
-{
-public:
-	static PrintHelper* getInstance() {
-		static unique_ptr<PrintHelper> printHelper;
-		if (printHelper.get() == nullptr) {
-			printHelper.reset(new PrintHelper());
-		}
-		return printHelper.get();
-	}
+class PrintHelper {
 
 private:
-	PrintHelper() {
-	}
-
-private:
-	int deep = -1;
+	static int deep;
 
 public:
-	void enter() {
+	static void Enter() {
 		deep++;
 	}
 
-	void enterPrint(string str) {
+	static void EnterPrint(string str) {
 		deep++;
-		print(str);
+		Print(str);
 	}
 
-	void exit() {
+	static void Exit() {
 		deep--;
 	}
 
-	void exitPrint(string str) {
-		print(str);
+	static void ExitPrint(string str) {
+		Print(str);
 		deep--;
 	}
 
-	void print(string str) {
+	static void Print(string str) {
 		for (int i = 0; i < deep; i++) {
 			cout << "\t";
 		}
@@ -50,3 +36,5 @@ public:
 	}
 
 };
+
+int PrintHelper::deep = -1;

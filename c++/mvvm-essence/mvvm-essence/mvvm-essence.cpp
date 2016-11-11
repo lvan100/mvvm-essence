@@ -13,38 +13,30 @@ using namespace mvvm::binding;
 template<typename T> struct PrintModel : public INotifyValueChanged {
 
 	virtual void onValueChanged(void* model) override {
-		PrintHelper::getInstance()->enter();
+		PrintHelper::Enter();
 
 		stringstream ss_model;
 		ss_model << ((Model<T>*)model)->get();
 
-		PrintHelper::getInstance()->print(string().append("PrintModel:").append(ss_model.str()));
-		PrintHelper::getInstance()->exit();
+		PrintHelper::Print(this->toString().append(":").append(ss_model.str()));
+		PrintHelper::Exit();
 	}
-};
 
-template<typename T> struct PrintModel<T*> : public INotifyValueChanged {
-
-	virtual void onValueChanged(void* model) override {
-		PrintHelper::getInstance()->enter();
-
-		stringstream ss_model;
-		ss_model << *(((Model<T*>*)model)->get());
-
-		PrintHelper::getInstance()->print(string().append("PrintModel:").append(ss_model.str()));
-		PrintHelper::getInstance()->exit();
+	string toString() {
+		stringstream ss;
+		ss << "PrintModel@" << this;
+		return ss.str();
 	}
+
 };
 
 PrintModel<int> printIntModel;
-PrintModel<int*> printIntPtrModel;
 PrintModel<float> printFloatModel;
 PrintModel<double> printDoubleModel;
-PrintModel<double*> printDoublePtrModel;
+
+Model<int> mi0(1), mi1(2), mi2(3, true);
 
 void test1() {
-
-	Model<int> mi0(1), mi1(2), mi2(3, true);
 
 	mi0.set(11); cout << endl;
 	mi1.set(22); cout << endl;
@@ -58,15 +50,15 @@ void test1() {
 	mi1.set(222); cout << endl;
 	mi2.set(333); cout << endl;
 
-	DataBinding<int, int> dii0(BindingType::TwoWay, &mi0);
-	mi1.setDataBinding(&dii0); cout << endl;
+	mi1.setDataBinding(make_binding<int, int>(BindingType::TwoWay, &mi0));
+	cout << endl;
 
 	mi0.set(11); cout << endl;
 	mi1.set(22); cout << endl;
 	mi2.set(33); cout << endl;
 
-	DataBinding<int, int> dii1(BindingType::TwoWay, &mi1);
-	mi2.setDataBinding(&dii1); cout << endl;
+	mi2.setDataBinding(make_binding<int, int>(BindingType::TwoWay, &mi1));
+	cout << endl;
 
 	mi0.set(1); cout << endl;
 	mi1.set(2); cout << endl;
@@ -84,65 +76,11 @@ void test2() {
 	mi0.set(11); cout << endl;
 	mf0.set(22.20f); cout << endl;
 
-	DataBinding<int, float> dif0(BindingType::TwoWay, &mi0);
-	mf0.setDataBinding(&dif0); cout << endl;
+	mf0.setDataBinding(make_binding<int, float>(BindingType::TwoWay, &mi0));
+	cout << endl;
 
 	mi0.set(111); cout << endl;
 	mf0.set(222.20f); cout << endl;
-}
-
-void test3() {
-
-	Model<int> mi0(1);
-	Model<double*> mdp0(new double(2.20));
-
-	mi0.addNotifyValueChanged(&printIntModel);
-	mdp0.addNotifyValueChanged(&printDoublePtrModel);
-
-	mi0.set(11); cout << endl;
-	mdp0.set(new double(22.20)); cout << endl;
-
-	DataBinding<int, double*> dif0(BindingType::TwoWay, &mi0);
-	mdp0.setDataBinding(&dif0); cout << endl;
-
-	mi0.set(111); cout << endl;
-	mdp0.set(new double(222.20)); cout << endl;
-}
-
-void test4() {
-
-	Model<int*> mip0(new int(1));
-	Model<double> mdp0(2.20);
-
-	mip0.addNotifyValueChanged(&printIntPtrModel);
-	mdp0.addNotifyValueChanged(&printDoubleModel);
-
-	mip0.set(new int(11)); cout << endl;
-	mdp0.set(22.20); cout << endl;
-
-	DataBinding<int*, double> dif0(BindingType::TwoWay, &mip0);
-	mdp0.setDataBinding(&dif0); cout << endl;
-
-	mip0.set(new int(111)); cout << endl;
-	mdp0.set(222.20); cout << endl;
-}
-
-void test5() {
-
-	Model<int*> mip0(new int(1));
-	Model<double*> mdp0(new double(2.20));
-
-	mip0.addNotifyValueChanged(&printIntPtrModel);
-	mdp0.addNotifyValueChanged(&printDoublePtrModel);
-
-	mip0.set(new int(11)); cout << endl;
-	mdp0.set(new double(22.20)); cout << endl;
-
-	DataBinding<int*, double*> dif0(BindingType::TwoWay, &mip0);
-	mdp0.setDataBinding(&dif0); cout << endl;
-
-	mip0.set(new int(111)); cout << endl;
-	mdp0.set(new double(222.20)); cout << endl;
 }
 
 struct Integer {
@@ -183,8 +121,8 @@ void test6() {
 	mi0.set(11); cout << endl;
 	mI0.set(22); cout << endl;
 
-	DataBinding<int, Integer> dif0(BindingType::TwoWay, &mi0);
-	mI0.setDataBinding(&dif0); cout << endl;
+	mI0.setDataBinding(make_binding<int, Integer>(BindingType::TwoWay, &mi0));
+	cout << endl;
 
 	mi0.set(111); cout << endl;
 	mI0.set(222); cout << endl;
@@ -215,6 +153,18 @@ basic_ostream<char, _Traits>& operator<<(
 	return (_Ostr << d.value);
 }
 
+template<> struct ValueConverter<Double, Integer> {
+
+	Integer convert(Double value) {
+		return int(value.value);
+	}
+
+	Double reverseConvert(Integer value) {
+		return value.value;
+	}
+
+};
+
 PrintModel<Double> printSDoubleModel;
 
 void test7() {
@@ -228,8 +178,8 @@ void test7() {
 	mD0.set(11.10); cout << endl;
 	mI0.set(22); cout << endl;
 
-	DataBinding<Double, Integer> dif0(BindingType::TwoWay, &mD0);
-	mI0.setDataBinding(&dif0); cout << endl;
+	mI0.setDataBinding(make_binding<Double, Integer>(BindingType::TwoWay, &mD0));
+	cout << endl;
 
 	mD0.set(111.10); cout << endl;
 	mI0.set(222); cout << endl;
@@ -238,11 +188,12 @@ void test7() {
 int main()
 {
 	test1();
-	test2();
 
-	test3();
-	test4();
-	test5();
+	mi0.set(11); cout << endl;
+	mi1.set(22); cout << endl;
+	mi2.set(33); cout << endl;
+
+	test2();
 
 	test6();
 	test7();

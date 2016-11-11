@@ -1,7 +1,9 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 using namespace std;
 
 #include "PrintHelper.h"
@@ -31,15 +33,16 @@ namespace mvvm {
 			/**
 			 * 数据绑定对象
 			 */
-			IDataBinding<T>* dataBinding = nullptr;
+			unique_ptr<IDataBinding<T>> dataBinding;
 
 		public:
+			// 要求数据类型支持拷贝运算符
 			Model(T value) : _value(value) {}
 			Model(T value, bool readOnly) : _value(value), _readOnly(readOnly) {}
 
 			virtual T get() override {
-				PrintHelper::getInstance()->print(this->toString().append(":Model.getValue"));
-				if (dataBinding == nullptr) {
+				PrintHelper::Print(this->toString().append(":Model.getValue"));
+				if (dataBinding.get() == nullptr) {
 					return _value;
 				} else {
 					return dataBinding->get();
@@ -47,10 +50,10 @@ namespace mvvm {
 			}
 
 			virtual void set(T value) override {
-				PrintHelper::getInstance()->enterPrint(this->toString().append(":Model.setValue.begin"));
+				PrintHelper::EnterPrint(this->toString().append(":Model.setValue.begin"));
 
 				if (!readOnly()) {
-					if (dataBinding == nullptr) {
+					if (dataBinding.get() == nullptr) {
 
 						stringstream ss_oldValue;
 						ss_oldValue << _value;
@@ -58,21 +61,21 @@ namespace mvvm {
 						stringstream ss_newValue;
 						ss_newValue << value;
 
-						PrintHelper::getInstance()->enterPrint(this->toString().append(":Model.setValue=")
+						PrintHelper::EnterPrint(this->toString().append(":Model.setValue=")
 							.append(ss_oldValue.str()).append("->").append(ss_newValue.str()));
 
-						PrintHelper::getInstance()->exit();
+						PrintHelper::Exit();
 
-						// 要求数据类型必须支持!=操作符
+						// 要求数据类型支持=及!=操作符
 						if (this->_value != value) {
 							this->_value = value;
 
-							PrintHelper::getInstance()->enterPrint(this->toString()
+							PrintHelper::EnterPrint(this->toString()
 								.append(":Model.notifyValueChanged.begin"));
 							{
 								notifyValueChanged();
 							}
-							PrintHelper::getInstance()->exitPrint(this->toString()
+							PrintHelper::ExitPrint(this->toString()
 								.append(":Model.notifyValueChanged.end"));
 						}
 
@@ -80,7 +83,8 @@ namespace mvvm {
 						dataBinding->set(value);
 					}
 				}
-				PrintHelper::getInstance()->exitPrint(this->toString().append(":Model.setValue.end"));
+
+				PrintHelper::ExitPrint(this->toString().append(":Model.setValue.end"));
 			}
 
 			bool readOnly() {
@@ -91,20 +95,20 @@ namespace mvvm {
 				this->_readOnly = readOnly;
 			}
 
-			IDataBinding<T>* getDataBinding() {
+			unique_ptr<IDataBinding<T>>& getDataBinding() {
 				return dataBinding;
 			}
 
-			void setDataBinding(IDataBinding<T>* dataBinding) {
-				PrintHelper::getInstance()->enterPrint(this->toString()
+			void setDataBinding(unique_ptr<IDataBinding<T>> dataBinding) {
+				PrintHelper::EnterPrint(this->toString()
 					.append(":Model.setDataBinding.begin"));
 				{
-					this->dataBinding = dataBinding;
-					dataBinding->setTarget(this);
+					this->dataBinding.reset(dataBinding.release());
+					this->dataBinding->setTarget(this);
 
 					this->notifyValueChanged();
 				}
-				PrintHelper::getInstance()->exitPrint(this->toString()
+				PrintHelper::ExitPrint(this->toString()
 					.append(":Model.setDataBinding.end"));
 			}
 
@@ -116,7 +120,15 @@ namespace mvvm {
 
 		public:
 			virtual void removeNotifyValueChanged(INotifyValueChanged* notify) {
-				// notifyList.erase(notify);
+
+				auto iter = find_if(notifyList.begin(), notifyList.end(),
+					[&](INotifyValueChanged* p) {
+					return p == notify;
+				});
+
+				if (iter != notifyList.end()) {
+					notifyList.erase(iter);
+				}
 			}
 
 			virtual void addNotifyValueChanged(INotifyValueChanged* notify) {
@@ -124,26 +136,26 @@ namespace mvvm {
 			}
 
 			virtual void onValueChanged(void* model) override {
-				PrintHelper::getInstance()->enterPrint(this->toString()
+				PrintHelper::EnterPrint(this->toString()
 					.append(":Model.onValueChanged"));
 
-				PrintHelper::getInstance()->print(this->toString()
+				PrintHelper::Print(this->toString()
 					.append(":Model.notifyValueChanged.begin"));
 				{
 					notifyValueChanged();
 				}
-				PrintHelper::getInstance()->exitPrint(this->toString()
+				PrintHelper::ExitPrint(this->toString()
 					.append(":Model.notifyValueChanged.end"));
 			}
 
 		public:
 			void notifyValueChanged() {
 				for (INotifyValueChanged* notify : notifyList) {
-					PrintHelper::getInstance()->enterPrint(":Notify.onValueChanged.begin");
+					PrintHelper::EnterPrint(":Notify.onValueChanged.begin");
 					{
 						notify->onValueChanged(this);
 					}
-					PrintHelper::getInstance()->exitPrint(":Notify.onValueChanged.end");
+					PrintHelper::ExitPrint(":Notify.onValueChanged.end");
 				}
 			}
 
@@ -152,6 +164,24 @@ namespace mvvm {
 				ss << "Model@" << this;
 				return ss.str();
 			}
+
+		};
+
+		/**
+		 * 针对指针特化的数据模型的实现
+		 */
+		template<typename T> class Model<T*> {
+
+			// 我认为不应该实现对指针的数据模型
+
+		};
+
+		/**
+		 * 针对引用特化的数据模型的实现
+		 */
+		template<typename T> class Model<T&> {
+
+			// 我认为不应该实现对引用的数据模型
 
 		};
 

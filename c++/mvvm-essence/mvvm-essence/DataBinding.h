@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+using namespace std;
+
 #include "PrintHelper.h"
 #include "IDataBinding.h"
 
@@ -19,56 +22,11 @@ namespace mvvm {
 		template<typename S, typename T> struct ValueConverter {
 
 			T convert(S value) {
-				return (T)value;
+				return (T) value;
 			}
 
 			S reverseConvert(T value) {
-				return (S)value;
-			}
-
-		};
-
-		/**
-		 * 值转换器
-		 */
-		template<typename S, typename T> struct ValueConverter<S*, T> {
-
-			T convert(S* value) {
-				return (T)(*value);
-			}
-
-			S* reverseConvert(T value) {
-				return new S((S)value);
-			}
-
-		};
-
-		/**
-		 * 值转换器
-		 */
-		template<typename S, typename T> struct ValueConverter<S, T*> {
-
-			T* convert(S value) {
-				return new T((T)value);
-			}
-
-			S reverseConvert(T* value) {
-				return (S)(*value);
-			}
-
-		};
-
-		/**
-		 * 值转换器
-		 */
-		template<typename S, typename T> struct ValueConverter<S*, T*> {
-
-			T* convert(S* value) {
-				return new T((T)*value);
-			}
-
-			S* reverseConvert(T* value) {
-				return new S((S)*value);
+				return (S) value;
 			}
 
 		};
@@ -76,7 +34,8 @@ namespace mvvm {
 		/**
 		 * 数据绑定的实现
 		 */
-		template<typename S, typename T> class DataBinding : public IDataBinding<T> {
+		template<typename S, typename T>
+		class DataBinding : public IDataBinding<T> {
 
 		private:
 			/**
@@ -94,16 +53,21 @@ namespace mvvm {
 			 */
 			BindingType type;
 
-		public:
-			DataBinding(BindingType type) {
-				this->type = type;
-			}
-
+		private:
 			DataBinding(BindingType type, IModel<S>* source) {
 				this->source = source;
 				this->type = type;
 			}
 
+			/**
+			 * 禁止使用栈类型是基于临时变量跨范围使用会崩溃的考虑。
+			 */
+
+			template<typename S, typename T>
+			friend unique_ptr<DataBinding<S, T>>
+			make_binding(BindingType type, IModel<S>* source);
+
+		public:
 			BindingType getType() {
 				return type;
 			}
@@ -125,38 +89,30 @@ namespace mvvm {
 			}
 
 			virtual void setTarget(IModel<T>* target) override {
+				source->addNotifyValueChanged(target);
 				this->target = target;
-				if (source != nullptr) {
-					source->addNotifyValueChanged(target);
-				}
 			}
 
 		private:
 			/**
 			 * 值转换器
 			 */
-			ValueConverter<S, T>* converter = new ValueConverter<S, T>();
+			ValueConverter<S, T> converter = ValueConverter<S, T>();
 
 		public:
-			void setValueConverter(ValueConverter<S, T>* converter) {
-				if (converter != nullptr) {
-					this->converter = converter;
-				}
-			}
-
 			virtual T get() override {
-				PrintHelper::getInstance()->print(this->toString().append(":getValue"));
-				return converter->convert(source->get());
+				PrintHelper::Print(this->toString().append(":getValue"));
+				return converter.convert(source->get());
 			}
 
 			virtual void set(T value) override {
-				PrintHelper::getInstance()->enterPrint(this->toString().append(":setValue.begin"));
+				PrintHelper::EnterPrint(this->toString().append(":setValue.begin"));
 				{
 					if (getType() == BindingType::TwoWay) {
-						source->set(converter->reverseConvert(value));
+						source->set(converter.reverseConvert(value));
 					}
 				}
-				PrintHelper::getInstance()->exitPrint(this->toString().append(":setValue.end"));
+				PrintHelper::ExitPrint(this->toString().append(":setValue.end"));
 			}
 
 		public:
@@ -167,6 +123,11 @@ namespace mvvm {
 			}
 
 		};
+
+		template<typename S, typename T>
+		inline unique_ptr<DataBinding<S, T>> make_binding(BindingType type, IModel<S>* source) {
+			return unique_ptr<DataBinding<S, T>>(new DataBinding<S, T>(type, source));
+		}
 
 	}
 }
