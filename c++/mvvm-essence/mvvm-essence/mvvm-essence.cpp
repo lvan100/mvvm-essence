@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include <list>
+#include <vector>
 #include <sstream>
 #include <iostream>
 using namespace std;
@@ -103,7 +105,7 @@ struct Integer {
 
 template<class _Traits> inline
 basic_ostream<char, _Traits>& operator<<(
-	basic_ostream<char, _Traits>& _Ostr, Integer i)
+	basic_ostream<char, _Traits>& _Ostr, Integer& i)
 {
 	return (_Ostr << i.value);
 }
@@ -148,19 +150,19 @@ struct Double {
 
 template<class _Traits> inline
 basic_ostream<char, _Traits>& operator<<(
-	basic_ostream<char, _Traits>& _Ostr, Double d)
+	basic_ostream<char, _Traits>& _Ostr, Double& d)
 {
 	return (_Ostr << d.value);
 }
 
 template<> struct ValueConverter<Double, Integer> {
 
-	Integer convert(Double value) {
-		return int(value.value);
+	Integer convert(Double&& value) {
+		return move(int(value.value));
 	}
 
-	Double reverseConvert(Integer value) {
-		return value.value;
+	Double reverseConvert(Integer&& value) {
+		return move(value.value);
 	}
 
 };
@@ -185,6 +187,132 @@ void test7() {
 	mI0.set(222); cout << endl;
 }
 
+PrintModel<vector<int>> printIntVectorModel;
+
+template<> struct ValueConverter<vector<int>, int> {
+
+	int convert(vector<int>&& value) {
+		if (value.size() > 0) {
+			return move(value.at(0));
+		} else {
+			return 0;
+		}
+	}
+
+	vector<int> reverseConvert(int&& value) {
+		return move(vector<int>(1, value));
+	}
+
+};
+
+template<class _Traits> inline
+basic_ostream<char, _Traits>& operator<<(
+	basic_ostream<char, _Traits>& _Ostr, vector<int>& vi)
+{
+	_Ostr << '[';
+	for (int i : vi) {
+		_Ostr << i << ',';
+	}
+	_Ostr << '\b' << ']';
+	return _Ostr;
+}
+
+void test8() {
+
+	Model<vector<int>> miv0(vector<int>(2, 2));
+	Model<int> mi0(1);
+
+	miv0.addNotifyValueChanged(&printIntVectorModel);
+	mi0.addNotifyValueChanged(&printIntModel);
+
+	miv0.set(vector<int>(2, 22)); cout << endl;
+	mi0.set(11); cout << endl;
+
+	mi0.setDataBinding(make_binding<vector<int>, int>(BindingType::TwoWay, &miv0));
+	cout << endl;
+
+	miv0.set(vector<int>(2, 222)); cout << endl;
+	mi0.set(111); cout << endl;
+}
+
+template<> struct ValueConverter<int, vector<int>> {
+
+	vector<int> convert(int&& value) {
+		return move(vector<int>(1, value));
+	}
+
+	int reverseConvert(vector<int>&& value) {
+		if (value.size() > 0) {
+			return move(value.at(0));
+		} else {
+			return 0;
+		}
+	}
+
+};
+
+void test9() {
+
+	Model<int> mi0(1);
+	Model<vector<int>> miv0(vector<int>(2, 2));
+
+	mi0.addNotifyValueChanged(&printIntModel);
+	miv0.addNotifyValueChanged(&printIntVectorModel);
+
+	mi0.set(11); cout << endl;
+	miv0.set(vector<int>(2, 22)); cout << endl;
+
+	miv0.setDataBinding(make_binding<int, vector<int>>(BindingType::TwoWay, &mi0));
+	cout << endl;
+
+	mi0.set(111); cout << endl;
+	miv0.set(vector<int>(2, 222)); cout << endl;
+}
+
+template<> struct ValueConverter<list<float>, vector<int>> {
+
+	vector<int> convert(list<float>&& value) {
+		return move(vector<int>(value.begin(), value.end()));
+	}
+
+	list<float> reverseConvert(vector<int>&& value) {
+		return move(list<float>(value.begin(), value.end()));
+	}
+
+};
+
+PrintModel<list<float>> printFloatListModel;
+
+template<class _Traits> inline
+basic_ostream<char, _Traits>& operator<<(
+	basic_ostream<char, _Traits>& _Ostr, list<float>& vi)
+{
+	_Ostr << '[';
+	for (float i : vi) {
+		_Ostr << i << ',';
+	}
+	_Ostr << '\b' << ']';
+	return _Ostr;
+}
+
+void test10() {
+
+	Model<list<float>> mfl0(list<float>(3, 1.1f));
+	Model<vector<int>> miv0(vector<int>(2, 2));
+
+	mfl0.addNotifyValueChanged(&printFloatListModel);
+	miv0.addNotifyValueChanged(&printIntVectorModel);
+
+	mfl0.set(list<float>(3, 11.1f)); cout << endl;
+	miv0.set(vector<int>(2, 22)); cout << endl;
+
+	miv0.setDataBinding(make_binding<list<float>, vector<int>>(BindingType::TwoWay, &mfl0));
+	cout << endl;
+
+	mfl0.set(list<float>(3, 111.1f)); cout << endl;
+	miv0.set(vector<int>(2, 222)); cout << endl;
+}
+
 int main()
 {
 	test1();
@@ -197,6 +325,11 @@ int main()
 
 	test6();
 	test7();
+
+	test8();
+	test9();
+
+	test10();
 
 	return 0;
 }

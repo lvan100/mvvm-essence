@@ -36,20 +36,20 @@ namespace mvvm {
 			unique_ptr<IDataBinding<T>> dataBinding;
 
 		public:
-			// 要求数据类型支持拷贝运算符
-			Model(T value) : _value(value) {}
-			Model(T value, bool readOnly) : _value(value), _readOnly(readOnly) {}
+			// 要求数据类型支持拷贝、移动运算符
+			Model(T&& value) : _value(value) {}
+			Model(T&& value, bool readOnly) : _value(value), _readOnly(readOnly) {}
 
 			virtual T get() override {
 				PrintHelper::Print(this->toString().append(":Model.getValue"));
 				if (dataBinding.get() == nullptr) {
-					return _value;
+					return _value; // 不要移动原值
 				} else {
-					return dataBinding->get();
+					return move(dataBinding->get());
 				}
 			}
 
-			virtual void set(T value) override {
+			virtual void set(T&& value) override {
 				PrintHelper::EnterPrint(this->toString().append(":Model.setValue.begin"));
 
 				if (!readOnly()) {
@@ -80,7 +80,7 @@ namespace mvvm {
 						}
 
 					} else {
-						dataBinding->set(value);
+						dataBinding->set(move(value));
 					}
 				}
 

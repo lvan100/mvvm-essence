@@ -16,7 +16,7 @@ namespace mvvm {
 		template<typename T> struct IModel : public INotifyValueChanged {
 
 			virtual T get() = 0;
-			virtual void set(T value) = 0;
+			virtual void set(T&& value) = 0;
 
 			virtual void addNotifyValueChanged(INotifyValueChanged* notify) = 0;
 			virtual void removeNotifyValueChanged(INotifyValueChanged* notify) = 0;
