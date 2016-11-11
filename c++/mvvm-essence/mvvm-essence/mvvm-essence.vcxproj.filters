@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="application">
+      <UniqueIdentifier>{e52230de-2b0b-45d7-97b5-39bfb299a0b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities">
+      <UniqueIdentifier>{68916056-4f61-4ddf-a2f2-9ded4c593657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mvvm">
+      <UniqueIdentifier>{d3e8393d-8c9d-44fc-8f2d-6dd68be340fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mvvm\model">
+      <UniqueIdentifier>{e6872b0a-60ca-42a2-914d-2cb47fc61128}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mvvm\binding">
+      <UniqueIdentifier>{5adf4326-68bd-407a-b4a6-544373b73e5f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="PrintHelper.h">
+      <Filter>utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>mvvm\model</Filter>
+    </ClInclude>
+    <ClInclude Include="DataBinding.h">
+      <Filter>mvvm\binding</Filter>
+    </ClInclude>
+    <ClInclude Include="IModel.h">
+      <Filter>mvvm\model</Filter>
+    </ClInclude>
+    <ClInclude Include="IDataBinding.h">
+      <Filter>mvvm\binding</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mvvm-essence.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
