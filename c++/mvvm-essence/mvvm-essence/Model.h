@@ -19,7 +19,7 @@ namespace mvvm {
 		 */
 		template<typename T> class Model : public IModel<T> {
 
-		private:
+		protected:
 			/**
 			 * 数据值
 			 */
@@ -205,6 +205,110 @@ namespace mvvm {
 		template<typename T> class Model<T&> {
 
 			// 我认为不应该实现对引用的数据模型
+
+		};
+
+		/**
+		 * 集合数据模型的实现
+		 */
+		template<typename T> class VectorModel : public Model<vector<T>> {
+
+		public:
+			// 要求数据类型支持拷贝、移动运算符
+			VectorModel(vector<T>&& value) : Model(move(value)) {}
+			VectorModel(vector<T>&& value, bool readOnly) : Model(move(value)，readOnly) {}
+
+			VectorModel& operator=(vector<T>&& _Right) {
+				PrintHelper::Print(this->toString()
+					.append(":VectorModel.operator=.begin"));
+				{
+					set(move(_Right));
+				}
+				PrintHelper::Print(this->toString()
+					.append(":VectorModel.operator=.end"));
+
+				return *this;
+			}
+
+			void push_back(T&& _Val) {
+				PrintHelper::Print(this->toString()
+					.append(":VectorModel.push_back.begin"));
+				{
+					if (!readOnly()) {
+						if (dataBinding.get() == nullptr) {
+
+							_value.push_back(move(_Val));
+
+							PrintHelper::EnterPrint(this->toString()
+								.append(":Model.notifyValueChanged.begin"));
+							{
+								notifyValueChanged();
+							}
+							PrintHelper::ExitPrint(this->toString()
+								.append(":Model.notifyValueChanged.end"));
+
+						} else {
+							vector<T> newValue(_value);
+							newValue.push_back(move(_Val));
+
+							dataBinding->set(move(newValue));
+						}
+					}
+				}
+				PrintHelper::Print(this->toString()
+					.append(":VectorModel.push_back.end"));
+			}
+
+			/**
+			 * 当数据模型为绑定目标时结果始终返回vector<T>::end()
+			 */
+			typename vector<T>::iterator
+			insert(typename vector<T>::const_iterator _Where, T&& _Val) {
+				vector<T>::iterator ret = _value.end();
+
+				PrintHelper::Print(this->toString()
+					.append(":VectorModel.insert.begin"));
+				{
+					if (!readOnly()) {
+						if (dataBinding.get() == nullptr) {
+
+							ret = _value.insert(_Where, move(_Val));
+
+							PrintHelper::EnterPrint(this->toString()
+								.append(":Model.notifyValueChanged.begin"));
+							{
+								notifyValueChanged();
+							}
+							PrintHelper::ExitPrint(this->toString()
+								.append(":Model.notifyValueChanged.end"));
+
+						} else {
+							vector<T> newValue(_value);
+
+							vector<T>::iterator _newWhere = newValue.begin();
+							for (auto iter = _value.begin(); iter != _Where; iter++) {
+								_newWhere++;
+							}
+
+							newValue.insert(_newWhere, move(_Val));
+
+							dataBinding->set(move(newValue));
+
+							ret = _value.end();
+						}
+					}
+				}
+				PrintHelper::Print(this->toString()
+					.append(":VectorModel.insert.end"));
+
+				return ret;
+			}
+
+			string toString() {
+				stringstream ss;
+				ss << "VectorModel@" << this;
+				return ss.str();
+			}
 
 		};
 

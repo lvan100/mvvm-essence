@@ -313,6 +313,60 @@ void test10() {
 	miv0.set(vector<int>(2, 222)); cout << endl;
 }
 
+void test11() {
+
+	Model<list<float>> mfl0(list<float>(3, 1.1f));
+	VectorModel<int> miv0(vector<int>(2, 2));
+
+	mfl0.addNotifyValueChanged(&printFloatListModel);
+	miv0.addNotifyValueChanged(&printIntVectorModel);
+
+	mfl0.set(list<float>(3, 11.1f)); cout << endl;
+	miv0 = vector<int>(2, 22); cout << endl;
+
+	miv0.setDataBinding(make_binding<list<float>, vector<int>>(BindingType::TwoWay, &mfl0));
+	cout << endl;
+
+	mfl0.set(list<float>(3, 111.1f)); cout << endl;
+
+	miv0.push_back(5); cout << endl;
+	auto iter = miv0.insert(miv0.get().begin(), 15); cout << endl;
+	miv0.insert(iter, 25); cout << endl;
+}
+
+template<> struct ValueConverter<vector<int>, list<float>> {
+
+	list<float> convert(vector<int>&& value) {
+		return move(list<float>(value.begin(), value.end()));
+	}
+
+	vector<int> reverseConvert(list<float>&& value) {
+		return move(vector<int>(value.begin(), value.end()));
+	}
+
+};
+
+void test12() {
+
+	VectorModel<int> miv0(vector<int>(2, 2));
+	Model<list<float>> mfl0(list<float>(3, 1.1f));
+
+	miv0.addNotifyValueChanged(&printIntVectorModel);
+	mfl0.addNotifyValueChanged(&printFloatListModel);
+
+	miv0 = vector<int>(2, 22); cout << endl;
+	mfl0.set(list<float>(3, 11.1f)); cout << endl;
+
+	mfl0.setDataBinding(make_binding<vector<int>, list<float>>(BindingType::TwoWay, &miv0));
+	cout << endl;
+
+	miv0.push_back(5); cout << endl;
+	auto iter = miv0.insert(miv0.get().begin(), 15); cout << endl;
+	miv0.insert(iter, 25); cout << endl;
+
+	mfl0.set(list<float>(3, 111.1f)); cout << endl;
+}
+
 int main()
 {
 	test1();
@@ -330,6 +384,9 @@ int main()
 	test9();
 
 	test10();
+
+	test11();
+	test12();
 
 	return 0;
 }
