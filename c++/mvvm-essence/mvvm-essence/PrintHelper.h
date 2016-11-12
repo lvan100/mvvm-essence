@@ -8,6 +8,7 @@ class PrintHelper {
 
 private:
 	static int deep;
+	static bool show;
 
 public:
 	static void Enter() {
@@ -29,12 +30,23 @@ public:
 	}
 
 	static void Print(string str) {
-		for (int i = 0; i < deep; i++) {
-			cout << "\t";
+		if (show) {
+			for (int i = 0; i < deep; i++) {
+				cout << "\t";
+			}
+			cout << str << endl;
 		}
-		cout << str << endl;
+	}
+
+	static void Close() {
+		show = false;
+	}
+
+	static void Open() {
+		show = true;
 	}
 
 };
 
 int PrintHelper::deep = -1;
+bool PrintHelper::show = true;

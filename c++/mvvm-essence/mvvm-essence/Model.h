@@ -37,8 +37,8 @@ namespace mvvm {
 
 		public:
 			// 要求数据类型支持拷贝、移动运算符
-			Model(T&& value) : _value(value) {}
-			Model(T&& value, bool readOnly) : _value(value), _readOnly(readOnly) {}
+			Model(T&& value) : _value(move(value)) {}
+			Model(T&& value, bool readOnly) : _value(move(value)), _readOnly(readOnly) {}
 
 			virtual const T& get() const override {
 				PrintHelper::Print(this->toString().append(":Model.getValue"));
@@ -60,11 +60,11 @@ namespace mvvm {
 						PrintHelper::EnterPrint(this->toString().append(":Model.setValue=")
 							.append(ss_oldValue.str()).append("->").append(ss_newValue.str()));
 
-						PrintHelper::Exit();
-
 						// 要求数据类型支持=及!=操作符
 						if (this->_value != value) {
-							this->_value = value;
+							this->_value = move(value);
+
+							PrintHelper::Exit();
 
 							PrintHelper::EnterPrint(this->toString()
 								.append(":Model.notifyValueChanged.begin"));
@@ -73,6 +73,9 @@ namespace mvvm {
 							}
 							PrintHelper::ExitPrint(this->toString()
 								.append(":Model.notifyValueChanged.end"));
+
+						} else {
+							PrintHelper::Exit();
 						}
 
 					} else {

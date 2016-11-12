@@ -13,6 +13,8 @@ using namespace mvvm::model;
 #include "DataBinding.h"
 using namespace mvvm::binding;
 
+#define SafeAssert(x) PrintHelper::Close(); assert(x); PrintHelper::Open()
+
 template<typename T> struct PrintModel : public INotifyValueChanged {
 
 	virtual void onValueChanged(void* model) override {
@@ -42,82 +44,82 @@ Model<int> mi0(1), mi1(2), mi2(3, true);
 void test1() {
 
 	mi0.set(11); cout << endl;
-	assert(mi0.get() == 11);
-	assert(mi1.get() == 2);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mi1.get() == 2);
+	SafeAssert(mi2.get() == 3);
 
 	mi1.set(22); cout << endl;
-	assert(mi0.get() == 11);
-	assert(mi1.get() == 22);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mi1.get() == 22);
+	SafeAssert(mi2.get() == 3);
 
 	mi2.set(33); cout << endl;
-	assert(mi0.get() == 11);
-	assert(mi1.get() == 22);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mi1.get() == 22);
+	SafeAssert(mi2.get() == 3);
 
 	mi0.addNotifyValueChanged(&printIntModel);
 	mi1.addNotifyValueChanged(&printIntModel);
 	mi2.addNotifyValueChanged(&printIntModel);
 
 	mi0.set(111); cout << endl;
-	assert(mi0.get() == 111);
-	assert(mi1.get() == 22);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 111);
+	SafeAssert(mi1.get() == 22);
+	SafeAssert(mi2.get() == 3);
 
 	mi1.set(222); cout << endl;
-	assert(mi0.get() == 111);
-	assert(mi1.get() == 222);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 111);
+	SafeAssert(mi1.get() == 222);
+	SafeAssert(mi2.get() == 3);
 
 	mi2.set(333); cout << endl;
-	assert(mi0.get() == 111);
-	assert(mi1.get() == 222);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 111);
+	SafeAssert(mi1.get() == 222);
+	SafeAssert(mi2.get() == 3);
 
 	mi1.setDataBinding(make_binding<int, int>(BindingType::TwoWay, &mi0));
 	cout << endl;
 
-	assert(mi0.get() == 111);
-	assert(mi1.get() == 111);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 111);
+	SafeAssert(mi1.get() == 111);
+	SafeAssert(mi2.get() == 3);
 
 	mi0.set(11); cout << endl;
-	assert(mi0.get() == 11);
-	assert(mi1.get() == 11);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mi1.get() == 11);
+	SafeAssert(mi2.get() == 3);
 
 	mi1.set(22); cout << endl;
-	assert(mi0.get() == 22);
-	assert(mi1.get() == 22);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 22);
+	SafeAssert(mi1.get() == 22);
+	SafeAssert(mi2.get() == 3);
 
 	mi2.set(33); cout << endl;
-	assert(mi0.get() == 22);
-	assert(mi1.get() == 22);
-	assert(mi2.get() == 3);
+	SafeAssert(mi0.get() == 22);
+	SafeAssert(mi1.get() == 22);
+	SafeAssert(mi2.get() == 3);
 
 	mi2.setDataBinding(make_binding<int, int>(BindingType::TwoWay, &mi1));
 	cout << endl;
 
-	assert(mi0.get() == 22);
-	assert(mi1.get() == 22);
-	assert(mi2.get() == 22);
+	SafeAssert(mi0.get() == 22);
+	SafeAssert(mi1.get() == 22);
+	SafeAssert(mi2.get() == 22);
 
 	mi0.set(1); cout << endl;
-	assert(mi0.get() == 1);
-	assert(mi1.get() == 1);
-	assert(mi2.get() == 1);
+	SafeAssert(mi0.get() == 1);
+	SafeAssert(mi1.get() == 1);
+	SafeAssert(mi2.get() == 1);
 
 	mi1.set(2); cout << endl;
-	assert(mi0.get() == 2);
-	assert(mi1.get() == 2);
-	assert(mi2.get() == 2);
+	SafeAssert(mi0.get() == 2);
+	SafeAssert(mi1.get() == 2);
+	SafeAssert(mi2.get() == 2);
 
 	mi2.set(3); cout << endl;
-	assert(mi0.get() == 2);
-	assert(mi1.get() == 2);
-	assert(mi2.get() == 2);
+	SafeAssert(mi0.get() == 2);
+	SafeAssert(mi1.get() == 2);
+	SafeAssert(mi2.get() == 2);
 }
 
 void test2() {
@@ -129,26 +131,26 @@ void test2() {
 	mf0.addNotifyValueChanged(&printFloatModel);
 
 	mi0.set(11); cout << endl;
-	assert(mi0.get() == 11);
-	assert(mf0.get() == 2.20f);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mf0.get() == 2.20f);
 
 	mf0.set(22.20f); cout << endl;
-	assert(mi0.get() == 11);
-	assert(mf0.get() == 22.20f);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mf0.get() == 22.20f);
 
 	mf0.setDataBinding(make_binding<int, float>(BindingType::TwoWay, &mi0));
 	cout << endl;
 
-	assert(mi0.get() == 11);
-	assert(mf0.get() == 11);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mf0.get() == 11);
 
 	mi0.set(111); cout << endl;
-	assert(mi0.get() == 111);
-	assert(mf0.get() == 111);
+	SafeAssert(mi0.get() == 111);
+	SafeAssert(mf0.get() == 111);
 
 	mf0.set(222.20f); cout << endl;
-	assert(mi0.get() == 222);
-	assert(mf0.get() == 222);
+	SafeAssert(mi0.get() == 222);
+	SafeAssert(mf0.get() == 222);
 }
 
 struct Integer {
@@ -191,42 +193,91 @@ void test6() {
 	mI0.addNotifyValueChanged(&printIntegerModel);
 
 	mi0.set(11); cout << endl;
-	assert(mi0.get() == 11);
-	assert(mI0.get() == 2);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mI0.get() == 2);
 
 	mI0.set(22); cout << endl;
-	assert(mi0.get() == 11);
-	assert(mI0.get() == 22);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mI0.get() == 22);
 
 	mI0.setDataBinding(make_binding<int, Integer>(BindingType::TwoWay, &mi0));
 	cout << endl;
 
-	assert(mi0.get() == 11);
-	assert(mI0.get() == 11);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mI0.get() == 11);
 
 	mi0.set(111); cout << endl;
-	assert(mi0.get() == 111);
-	assert(mI0.get() == 111);
+	SafeAssert(mi0.get() == 111);
+	SafeAssert(mI0.get() == 111);
 
 	mI0.set(222); cout << endl;
-	assert(mi0.get() == 222);
-	assert(mI0.get() == 222);
+	SafeAssert(mi0.get() == 222);
+	SafeAssert(mI0.get() == 222);
 }
 
 struct Double {
 
-	double value;
+	double value = 0.0;
 
 	operator double() {
 		return value;
 	}
 
 	Double(double value) {
+		PrintHelper::Print(string("{") + toString(this)
+			+ ":Double:double" + " <- " + toString(value) + "}");
 		this->value = value;
+	}
+
+	Double(const Double& d) {
+		PrintHelper::Print(string("{") + toString(this)
+			+ ":Double:const Double&" + " <- " + toString(&d) + "}");
+		this->value = d.value;
+	}
+
+	Double(Double&& d) {
+		PrintHelper::Print(string("{") + toString(this)
+			+ ":Double:Double&&" + " <- " + toString(&d) + "}");
+		this->value = move(d.value);
+	}
+
+	Double& operator= (double value) {
+		PrintHelper::Print(string("{") + toString(this)
+			+ ":Double:= const Double&" + " <- " + toString(value) + "}");
+		this->value = value;
+		return *this;
+	}
+
+	Double& operator= (const Double& d) {
+		PrintHelper::Print(string("{") + toString(this)
+			+ ":Double:= const Double&" + " <- " + toString(&d) + "}");
+		this->value = d.value;
+		return *this;
+	}
+
+	Double& operator= (Double&& d) {
+		PrintHelper::Print(string("{") + toString(this)
+			+ ":Double:= Double&&" + " <- " + toString(&d) + "}");
+		this->value = move(d.value);
+		return *this;
 	}
 
 	bool operator != (Double& i) {
 		return this->value != i.value;
+	}
+
+	string toString(const Double* p) const {
+		stringstream ss;
+		if (p != nullptr) {
+			ss << "Double@" << p << "=" << p->value;
+		}
+		return ss.str();
+	}
+
+	string toString(double value) const {
+		stringstream ss;
+		ss << value;
+		return ss.str();
 	}
 
 };
@@ -265,26 +316,26 @@ void test7() {
 	mI0.addNotifyValueChanged(&printIntegerModel);
 
 	mD0.set(11.10); cout << endl;
-	assert(mD0.get() == 11.10);
-	assert(mI0.get() == 2);
+	SafeAssert(mD0.get() == 11.10);
+	SafeAssert(mI0.get() == 2);
 
 	mI0.set(22); cout << endl;
-	assert(mD0.get() == 11.10);
-	assert(mI0.get() == 22);
+	SafeAssert(mD0.get() == 11.10);
+	SafeAssert(mI0.get() == 22);
 
 	mI0.setDataBinding(make_binding<Double, Integer>(BindingType::TwoWay, &mD0));
 	cout << endl;
 
-	assert(mD0.get() == 11.10);
-	assert(mI0.get() == 11);
+	SafeAssert(mD0.get() == 11.10);
+	SafeAssert(mI0.get() == 11);
 
 	mD0.set(111.10); cout << endl;
-	assert(mD0.get() == 111.10);
-	assert(mI0.get() == 111);
+	SafeAssert(mD0.get() == 111.10);
+	SafeAssert(mI0.get() == 111);
 
 	mI0.set(222); cout << endl;
-	assert(mD0.get() == 222);
-	assert(mI0.get() == 222);
+	SafeAssert(mD0.get() == 222);
+	SafeAssert(mI0.get() == 222);
 }
 
 PrintModel<vector<int>> printIntVectorModel;
@@ -326,26 +377,26 @@ void test8() {
 	mi0.addNotifyValueChanged(&printIntModel);
 
 	miv0.set(vector<int>(2, 22)); cout << endl;
-	assert(miv0.get() == vector<int>(2, 22));
-	assert(mi0.get() == 1);
+	SafeAssert(miv0.get() == vector<int>(2, 22));
+	SafeAssert(mi0.get() == 1);
 
 	mi0.set(11); cout << endl;
-	assert(miv0.get() == vector<int>(2, 22));
-	assert(mi0.get() == 11);
+	SafeAssert(miv0.get() == vector<int>(2, 22));
+	SafeAssert(mi0.get() == 11);
 
 	mi0.setDataBinding(make_binding<vector<int>, int>(BindingType::TwoWay, &miv0));
 	cout << endl;
 
-	assert(miv0.get() == vector<int>(2, 22));
-	assert(mi0.get() == 22);
+	SafeAssert(miv0.get() == vector<int>(2, 22));
+	SafeAssert(mi0.get() == 22);
 
 	miv0.set(vector<int>(2, 222)); cout << endl;
-	assert(miv0.get() == vector<int>(2, 222));
-	assert(mi0.get() == 222);
+	SafeAssert(miv0.get() == vector<int>(2, 222));
+	SafeAssert(mi0.get() == 222);
 
 	mi0.set(111); cout << endl;
-	assert(miv0.get() == vector<int>(1, 111));
-	assert(mi0.get() == 111);
+	SafeAssert(miv0.get() == vector<int>(1, 111));
+	SafeAssert(mi0.get() == 111);
 }
 
 template<> struct ValueConverter<int, vector<int>> {
@@ -373,26 +424,26 @@ void test9() {
 	miv0.addNotifyValueChanged(&printIntVectorModel);
 
 	mi0.set(11); cout << endl;
-	assert(mi0.get() == 11);
-	assert(miv0.get() == vector<int>(2, 2));
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(miv0.get() == vector<int>(2, 2));
 
 	miv0.set(vector<int>(2, 22)); cout << endl;
-	assert(mi0.get() == 11);
-	assert(miv0.get() == vector<int>(2, 22));
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(miv0.get() == vector<int>(2, 22));
 
 	miv0.setDataBinding(make_binding<int, vector<int>>(BindingType::TwoWay, &mi0));
 	cout << endl;
 
-	assert(mi0.get() == 11);
-	assert(miv0.get() == vector<int>(1, 11));
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(miv0.get() == vector<int>(1, 11));
 
 	mi0.set(111); cout << endl;
-	assert(mi0.get() == 111);
-	assert(miv0.get() == vector<int>(1, 111));
+	SafeAssert(mi0.get() == 111);
+	SafeAssert(miv0.get() == vector<int>(1, 111));
 
 	miv0.set(vector<int>(2, 222)); cout << endl;
-	assert(mi0.get() == 222);
-	assert(miv0.get() == vector<int>(1, 222));
+	SafeAssert(mi0.get() == 222);
+	SafeAssert(miv0.get() == vector<int>(1, 222));
 }
 
 template<> struct ValueConverter<list<float>, vector<int>> {
@@ -430,26 +481,26 @@ void test10() {
 	miv0.addNotifyValueChanged(&printIntVectorModel);
 
 	mfl0.set(list<float>(3, 11.1f)); cout << endl;
-	assert(mfl0.get() == list<float>(3, 11.1f));
-	assert(miv0.get() == vector<int>(2, 2));
+	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
+	SafeAssert(miv0.get() == vector<int>(2, 2));
 
 	miv0.set(vector<int>(2, 22)); cout << endl;
-	assert(mfl0.get() == list<float>(3, 11.1f));
-	assert(miv0.get() == vector<int>(2, 22));
+	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
+	SafeAssert(miv0.get() == vector<int>(2, 22));
 
 	miv0.setDataBinding(make_binding<list<float>, vector<int>>(BindingType::TwoWay, &mfl0));
 	cout << endl;
 
-	assert(mfl0.get() == list<float>(3, 11.1f));
-	assert(miv0.get() == vector<int>(3, 11));
+	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
+	SafeAssert(miv0.get() == vector<int>(3, 11));
 
 	mfl0.set(list<float>(3, 111.1f)); cout << endl;
-	assert(mfl0.get() == list<float>(3, 111.1f));
-	assert(miv0.get() == vector<int>(3, 111));
+	SafeAssert(mfl0.get() == list<float>(3, 111.1f));
+	SafeAssert(miv0.get() == vector<int>(3, 111));
 
 	miv0.set(vector<int>(2, 222)); cout << endl;
-	assert(mfl0.get() == list<float>(2, 222));
-	assert(miv0.get() == vector<int>(2, 222));
+	SafeAssert(mfl0.get() == list<float>(2, 222));
+	SafeAssert(miv0.get() == vector<int>(2, 222));
 }
 
 void test11() {
@@ -461,34 +512,34 @@ void test11() {
 	miv0.addNotifyValueChanged(&printIntVectorModel);
 
 	mfl0.set(list<float>(3, 11.1f)); cout << endl;
-	assert(mfl0.get() == list<float>(3, 11.1f));
-	assert(miv0.get() == vector<int>(2, 2));
+	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
+	SafeAssert(miv0.get() == vector<int>(2, 2));
 
 	miv0 = vector<int>(2, 22); cout << endl;
-	assert(mfl0.get() == list<float>(3, 11.1f));
-	assert(miv0.get() == vector<int>(2, 22));
+	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
+	SafeAssert(miv0.get() == vector<int>(2, 22));
 
 	miv0.setDataBinding(make_binding<list<float>, vector<int>>(BindingType::TwoWay, &mfl0));
 	cout << endl;
 
-	assert(mfl0.get() == list<float>(3, 11.1f));
-	assert(miv0.get() == vector<int>(3, 11));
+	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
+	SafeAssert(miv0.get() == vector<int>(3, 11));
 
 	mfl0.set(list<float>(3, 111.1f)); cout << endl;
-	assert(mfl0.get() == list<float>(3, 111.1f));
-	assert(miv0.get() == vector<int>(3, 111));
+	SafeAssert(mfl0.get() == list<float>(3, 111.1f));
+	SafeAssert(miv0.get() == vector<int>(3, 111));
 
 	miv0.push_back(5); cout << endl;
-	assert(mfl0.get() == list<float>({ 111,111,111,5 }));
-	assert(miv0.get() == vector<int>({ 111,111,111,5 }));
+	SafeAssert(mfl0.get() == list<float>({ 111,111,111,5 }));
+	SafeAssert(miv0.get() == vector<int>({ 111,111,111,5 }));
 
 	auto iter = miv0.insert(miv0.get().begin(), 15); cout << endl;
-	assert(mfl0.get() == list<float>({ 15,111,111,111,5 }));
-	assert(miv0.get() == vector<int>({ 15,111,111,111,5 }));
+	SafeAssert(mfl0.get() == list<float>({ 15,111,111,111,5 }));
+	SafeAssert(miv0.get() == vector<int>({ 15,111,111,111,5 }));
 
 	miv0.insert(iter, 25); cout << endl;
-	assert(mfl0.get() == list<float>({ 15,111,111,111,5,25 }));
-	assert(miv0.get() == vector<int>({ 15,111,111,111,5,25 }));
+	SafeAssert(mfl0.get() == list<float>({ 15,111,111,111,5,25 }));
+	SafeAssert(miv0.get() == vector<int>({ 15,111,111,111,5,25 }));
 }
 
 template<> struct ValueConverter<vector<int>, list<float>> {
@@ -512,34 +563,34 @@ void test12() {
 	mfl0.addNotifyValueChanged(&printFloatListModel);
 
 	miv0 = vector<int>(2, 22); cout << endl;
-	assert(miv0.get() == vector<int>(2, 22));
-	assert(mfl0.get() == list<float>(3, 1.1f));
+	SafeAssert(miv0.get() == vector<int>(2, 22));
+	SafeAssert(mfl0.get() == list<float>(3, 1.1f));
 
 	mfl0.set(list<float>(3, 11.1f)); cout << endl;
-	assert(miv0.get() == vector<int>(2, 22));
-	assert(mfl0.get() == list<float>(3, 11.1f));
+	SafeAssert(miv0.get() == vector<int>(2, 22));
+	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
 
 	mfl0.setDataBinding(make_binding<vector<int>, list<float>>(BindingType::TwoWay, &miv0));
 	cout << endl;
 
-	assert(miv0.get() == vector<int>(2, 22));
-	assert(mfl0.get() == list<float>(2, 22));
+	SafeAssert(miv0.get() == vector<int>(2, 22));
+	SafeAssert(mfl0.get() == list<float>(2, 22));
 
 	miv0.push_back(5); cout << endl;
-	assert(miv0.get() == vector<int>({ 22,22,5 }));
-	assert(mfl0.get() == list<float>({ 22,22,5 }));
+	SafeAssert(miv0.get() == vector<int>({ 22,22,5 }));
+	SafeAssert(mfl0.get() == list<float>({ 22,22,5 }));
 
 	auto iter = miv0.insert(miv0.get().begin(), 15); cout << endl;
-	assert(miv0.get() == vector<int>({ 15,22,22,5 }));
-	assert(mfl0.get() == list<float>({ 15,22,22,5 }));
+	SafeAssert(miv0.get() == vector<int>({ 15,22,22,5 }));
+	SafeAssert(mfl0.get() == list<float>({ 15,22,22,5 }));
 
 	miv0.insert(iter, 25); cout << endl;
-	assert(miv0.get() == vector<int>({ 25,15,22,22,5 }));
-	assert(mfl0.get() == list<float>({ 25,15,22,22,5 }));
+	SafeAssert(miv0.get() == vector<int>({ 25,15,22,22,5 }));
+	SafeAssert(mfl0.get() == list<float>({ 25,15,22,22,5 }));
 
 	mfl0.set(list<float>(3, 111.1f)); cout << endl;
-	assert(miv0.get() == vector<int>(3, 111));
-	assert(mfl0.get() == list<float>(3, 111));
+	SafeAssert(miv0.get() == vector<int>(3, 111));
+	SafeAssert(mfl0.get() == list<float>(3, 111));
 }
 
 int main()
@@ -547,19 +598,19 @@ int main()
 	test1();
 
 	mi0.set(11); cout << endl;
-	assert(mi0.get() == 11);
-	assert(mi1.get() == 11);
-	assert(mi2.get() == 11);
+	SafeAssert(mi0.get() == 11);
+	SafeAssert(mi1.get() == 11);
+	SafeAssert(mi2.get() == 11);
 
 	mi1.set(22); cout << endl;
-	assert(mi0.get() == 22);
-	assert(mi1.get() == 22);
-	assert(mi2.get() == 22);
+	SafeAssert(mi0.get() == 22);
+	SafeAssert(mi1.get() == 22);
+	SafeAssert(mi2.get() == 22);
 
 	mi2.set(33); cout << endl;
-	assert(mi0.get() == 22);
-	assert(mi1.get() == 22);
-	assert(mi2.get() == 22);
+	SafeAssert(mi0.get() == 22);
+	SafeAssert(mi1.get() == 22);
+	SafeAssert(mi2.get() == 22);
 
 	test2();
 
