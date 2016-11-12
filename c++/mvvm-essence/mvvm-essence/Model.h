@@ -40,13 +40,9 @@ namespace mvvm {
 			Model(T&& value) : _value(value) {}
 			Model(T&& value, bool readOnly) : _value(value), _readOnly(readOnly) {}
 
-			virtual T get() override {
+			virtual T& get() override {
 				PrintHelper::Print(this->toString().append(":Model.getValue"));
-				if (dataBinding.get() == nullptr) {
-					return _value; // 不要移动原值
-				} else {
-					return move(dataBinding->get());
-				}
+				return _value;
 			}
 
 			virtual void set(T&& value) override {
@@ -99,14 +95,14 @@ namespace mvvm {
 				return dataBinding;
 			}
 
-			void setDataBinding(unique_ptr<IDataBinding<T>> dataBinding) {
+			void setDataBinding(unique_ptr<IDataBinding<T>> binding) {
 				PrintHelper::EnterPrint(this->toString()
 					.append(":Model.setDataBinding.begin"));
 				{
-					this->dataBinding.reset(dataBinding.release());
-					this->dataBinding->setTarget(this);
+					dataBinding.reset(binding.release());
+					dataBinding->setTarget(this);
 
-					this->notifyValueChanged();
+					this->refreshData();
 				}
 				PrintHelper::ExitPrint(this->toString()
 					.append(":Model.setDataBinding.end"));
@@ -137,9 +133,36 @@ namespace mvvm {
 
 			virtual void onValueChanged(void* model) override {
 				PrintHelper::EnterPrint(this->toString()
-					.append(":Model.onValueChanged"));
+					.append(":Model.onValueChanged.begin"));
 
-				PrintHelper::Print(this->toString()
+				refreshData();
+
+				PrintHelper::ExitPrint(this->toString()
+					.append(":Model.onValueChanged.end"));
+			}
+
+		private:
+			void refreshData() {
+				PrintHelper::EnterPrint(this->toString()
+					.append(":Model.refreshData.begin"));
+				{
+					PrintHelper::Enter();
+					{
+						this->_value = move(dataBinding->get());
+
+						stringstream ss_value;
+						ss_value << _value;
+
+						PrintHelper::Print(this->toString()
+							.append(":refreshValue=")
+							.append(ss_value.str()));
+					}
+					PrintHelper::Exit();
+				}
+				PrintHelper::ExitPrint(this->toString()
+					.append(":Model.refreshData.end"));
+
+				PrintHelper::EnterPrint(this->toString()
 					.append(":Model.notifyValueChanged.begin"));
 				{
 					notifyValueChanged();
