@@ -21,12 +21,12 @@ namespace mvvm {
 		 */
 		template<typename S, typename T> struct ValueConverter {
 
-			T convert(S&& value) {
-				return move((T)value);
+			T convert(const S& value) {
+				return move(T(value));
 			}
 
 			S reverseConvert(T&& value) {
-				return move((S)value);
+				return move(S(move(value)));
 			}
 
 		};
@@ -102,7 +102,7 @@ namespace mvvm {
 		public:
 			virtual T get() override {
 				PrintHelper::Print(this->toString().append(":getValue"));
-				return move(converter.convert(move(source->get())));
+				return move(converter.convert(source->get()));
 			}
 
 			virtual void set(T&& value) override {
@@ -116,7 +116,7 @@ namespace mvvm {
 			}
 
 		public:
-			string toString() {
+			string toString() const {
 				stringstream ss;
 				ss << "DataBinding@" << this;
 				return ss.str();

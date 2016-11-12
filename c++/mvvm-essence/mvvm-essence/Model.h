@@ -40,7 +40,7 @@ namespace mvvm {
 			Model(T&& value) : _value(value) {}
 			Model(T&& value, bool readOnly) : _value(value), _readOnly(readOnly) {}
 
-			virtual T& get() override {
+			virtual const T& get() const override {
 				PrintHelper::Print(this->toString().append(":Model.getValue"));
 				return _value;
 			}
@@ -182,7 +182,7 @@ namespace mvvm {
 				}
 			}
 
-			string toString() {
+			string toString() const {
 				stringstream ss;
 				ss << "Model@" << this;
 				return ss.str();
