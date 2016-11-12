@@ -155,7 +155,7 @@ void test2() {
 
 struct Integer {
 
-	int value;
+	int value = 0;
 
 	operator int() {
 		return value;
@@ -338,8 +338,6 @@ void test7() {
 	SafeAssert(mI0.get() == 222);
 }
 
-PrintModel<vector<int>> printIntVectorModel;
-
 template<> struct ValueConverter<vector<int>, int> {
 
 	int convert(const vector<int>& value) {
@@ -367,6 +365,8 @@ basic_ostream<char, _Traits>& operator<<(
 	_Ostr << '\b' << ']';
 	return _Ostr;
 }
+
+PrintModel<vector<int>> printIntVectorModel;
 
 void test8() {
 
@@ -458,8 +458,6 @@ template<> struct ValueConverter<list<float>, vector<int>> {
 
 };
 
-PrintModel<list<float>> printFloatListModel;
-
 template<class _Traits> inline
 basic_ostream<char, _Traits>& operator<<(
 	basic_ostream<char, _Traits>& _Ostr, const list<float>& vi)
@@ -471,6 +469,8 @@ basic_ostream<char, _Traits>& operator<<(
 	_Ostr << '\b' << ']';
 	return _Ostr;
 }
+
+PrintModel<list<float>> printFloatListModel;
 
 void test10() {
 
@@ -529,17 +529,17 @@ void test11() {
 	SafeAssert(mfl0.get() == list<float>(3, 111.1f));
 	SafeAssert(miv0.get() == vector<int>(3, 111));
 
-	miv0.push_back(5); cout << endl;
-	SafeAssert(mfl0.get() == list<float>({ 111,111,111,5 }));
-	SafeAssert(miv0.get() == vector<int>({ 111,111,111,5 }));
+	//miv0.push_back(5); cout << endl;
+	//SafeAssert(mfl0.get() == list<float>({ 111,111,111,5 }));
+	//SafeAssert(miv0.get() == vector<int>({ 111,111,111,5 }));
 
-	auto iter = miv0.insert(miv0.get().begin(), 15); cout << endl;
-	SafeAssert(mfl0.get() == list<float>({ 15,111,111,111,5 }));
-	SafeAssert(miv0.get() == vector<int>({ 15,111,111,111,5 }));
+	//auto iter = miv0.insert(miv0.get().begin(), 15); cout << endl;
+	//SafeAssert(mfl0.get() == list<float>({ 15,111,111,111,5 }));
+	//SafeAssert(miv0.get() == vector<int>({ 15,111,111,111,5 }));
 
-	miv0.insert(iter, 25); cout << endl;
-	SafeAssert(mfl0.get() == list<float>({ 15,111,111,111,5,25 }));
-	SafeAssert(miv0.get() == vector<int>({ 15,111,111,111,5,25 }));
+	//miv0.insert(iter, 25); cout << endl;
+	//SafeAssert(mfl0.get() == list<float>({ 15,111,111,111,5,25 }));
+	//SafeAssert(miv0.get() == vector<int>({ 15,111,111,111,5,25 }));
 }
 
 template<> struct ValueConverter<vector<int>, list<float>> {

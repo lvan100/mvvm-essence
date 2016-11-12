@@ -13,7 +13,14 @@ namespace mvvm {
 		 * 数据模型值变化通知接口
 		 */
 		struct INotifyValueChanged {
+
+			/**
+			 * 通知数据模型已经发生变化
+			 *
+			 * @param mode 发生变化的数据模型
+			 */
 			virtual void onValueChanged(void* model) = 0;
+
 		};
 
 		/**
@@ -21,6 +28,9 @@ namespace mvvm {
 		 */
 		template<typename T> struct IModel : public INotifyValueChanged {
 
+			/**
+			 * 返回数据模型值的引用，但是又要限制值不能被修改
+			 */
 			virtual const T& get() const = 0;
 			virtual void set(T&& value) = 0;
 

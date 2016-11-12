@@ -60,19 +60,15 @@ namespace mvvm {
 						PrintHelper::EnterPrint(this->toString().append(":Model.setValue=")
 							.append(ss_oldValue.str()).append("->").append(ss_newValue.str()));
 
-						// 要求数据类型支持=及!=操作符
+						// 要求数据类型支持!=操作符
 						if (this->_value != value) {
+
+							// 要求数据类型支持=操作符
 							this->_value = move(value);
 
 							PrintHelper::Exit();
 
-							PrintHelper::EnterPrint(this->toString()
-								.append(":Model.notifyValueChanged.begin"));
-							{
-								notifyValueChanged();
-							}
-							PrintHelper::ExitPrint(this->toString()
-								.append(":Model.notifyValueChanged.end"));
+							notifyValueChanged();
 
 						} else {
 							PrintHelper::Exit();
@@ -121,7 +117,7 @@ namespace mvvm {
 			virtual void removeNotifyValueChanged(INotifyValueChanged* notify) {
 
 				auto iter = find_if(notifyList.begin(), notifyList.end(),
-					[&](INotifyValueChanged* p) {
+					[&notify](INotifyValueChanged* p) {
 					return p == notify;
 				});
 
@@ -138,7 +134,7 @@ namespace mvvm {
 				PrintHelper::EnterPrint(this->toString()
 					.append(":Model.onValueChanged.begin"));
 
-				refreshData();
+				this->refreshData();
 
 				PrintHelper::ExitPrint(this->toString()
 					.append(":Model.onValueChanged.end"));
@@ -165,24 +161,24 @@ namespace mvvm {
 				PrintHelper::ExitPrint(this->toString()
 					.append(":Model.refreshData.end"));
 
-				PrintHelper::EnterPrint(this->toString()
-					.append(":Model.notifyValueChanged.begin"));
-				{
-					notifyValueChanged();
-				}
-				PrintHelper::ExitPrint(this->toString()
-					.append(":Model.notifyValueChanged.end"));
+				notifyValueChanged();
 			}
 
 		public:
 			void notifyValueChanged() {
-				for (INotifyValueChanged* notify : notifyList) {
-					PrintHelper::EnterPrint(":Notify.onValueChanged.begin");
-					{
-						notify->onValueChanged(this);
+				PrintHelper::EnterPrint(this->toString()
+					.append(":Model.notifyValueChanged.begin"));
+				{
+					for (INotifyValueChanged* notify : notifyList) {
+						PrintHelper::EnterPrint(":Notify.onValueChanged.begin");
+						{
+							notify->onValueChanged(this);
+						}
+						PrintHelper::ExitPrint(":Notify.onValueChanged.end");
 					}
-					PrintHelper::ExitPrint(":Notify.onValueChanged.end");
 				}
+				PrintHelper::ExitPrint(this->toString()
+					.append(":Model.notifyValueChanged.end"));
 			}
 
 			string toString() const {
@@ -233,6 +229,9 @@ namespace mvvm {
 				return *this;
 			}
 
+			/**
+			 * 只允许对源Model数据进行此操作
+			 */
 			void push_back(T&& _Val) {
 				PrintHelper::Print(this->toString()
 					.append(":VectorModel.push_back.begin"));
@@ -242,19 +241,12 @@ namespace mvvm {
 
 							_value.push_back(move(_Val));
 
-							PrintHelper::EnterPrint(this->toString()
-								.append(":Model.notifyValueChanged.begin"));
-							{
-								notifyValueChanged();
-							}
-							PrintHelper::ExitPrint(this->toString()
-								.append(":Model.notifyValueChanged.end"));
+							notifyValueChanged();
 
 						} else {
-							vector<T> newValue(_value);
-							newValue.push_back(move(_Val));
-
-							dataBinding->set(move(newValue));
+							#if _ITERATOR_DEBUG_LEVEL == 2
+								_DEBUG_ERROR("not allowed to push value to binded model");
+							#endif /* _ITERATOR_DEBUG_LEVEL == 2 */
 						}
 					}
 				}
@@ -263,7 +255,7 @@ namespace mvvm {
 			}
 
 			/**
-			 * 当数据模型为绑定目标时结果始终返回vector<T>::end()
+			 * 只允许对源Model数据进行此操作
 			 */
 			typename vector<T>::iterator
 			insert(typename vector<T>::const_iterator _Where, T&& _Val) {
@@ -277,27 +269,12 @@ namespace mvvm {
 
 							ret = _value.insert(_Where, move(_Val));
 
-							PrintHelper::EnterPrint(this->toString()
-								.append(":Model.notifyValueChanged.begin"));
-							{
-								notifyValueChanged();
-							}
-							PrintHelper::ExitPrint(this->toString()
-								.append(":Model.notifyValueChanged.end"));
+							notifyValueChanged();
 
 						} else {
-							vector<T> newValue(_value);
-
-							vector<T>::iterator _newWhere = newValue.begin();
-							for (auto iter = _value.begin(); iter != _Where; iter++) {
-								_newWhere++;
-							}
-
-							newValue.insert(_newWhere, move(_Val));
-
-							dataBinding->set(move(newValue));
-
-							ret = _value.end();
+							#if _ITERATOR_DEBUG_LEVEL == 2
+								_DEBUG_ERROR("not allowed to insert value to binded model");
+							#endif /* _ITERATOR_DEBUG_LEVEL == 2 */
 						}
 					}
 				}
@@ -307,7 +284,7 @@ namespace mvvm {
 				return ret;
 			}
 
-			string toString() {
+			string toString() const {
 				stringstream ss;
 				ss << "VectorModel@" << this;
 				return ss.str();
