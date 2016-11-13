@@ -295,11 +295,11 @@ basic_ostream<char, _Traits>& operator<<(
 
 template<> struct ValueConverter<Double, Integer> {
 
-	void convert(const Double& source, Integer& target) {
+	static void convert(const Double& source, Integer& target) {
 		target.value = int(source.value);
 	}
 
-	Double reverseConvert(Integer&& value) {
+	static Double reverseConvert(Integer&& value) {
 		return move(value.value);
 	}
 
@@ -340,11 +340,11 @@ void test7() {
 
 template<> struct ValueConverter<Integer, Double> {
 
-	void convert(const Integer& source, Double& target) {
+	static void convert(const Integer& source, Double& target) {
 		target.value = source.value;
 	}
 
-	Integer reverseConvert(Double&& value) {
+	static Integer reverseConvert(Double&& value) {
 		return move(int(value.value));
 	}
 
@@ -383,13 +383,13 @@ void test7_2() {
 
 template<> struct ValueConverter<vector<int>, int> {
 
-	void convert(const vector<int>& source, int& target) {
+	static void convert(const vector<int>& source, int& target) {
 		if (source.size() > 0) {
 			target = int(source.at(0));
 		}
 	}
 
-	vector<int> reverseConvert(int&& value) {
+	static vector<int> reverseConvert(int&& value) {
 		return move(vector<int>(1, value));
 	}
 
@@ -442,11 +442,11 @@ void test8() {
 
 template<> struct ValueConverter<int, vector<int>> {
 
-	void convert(const int& source, vector<int>& target) {
+	static void convert(const int& source, vector<int>& target) {
 		target = vector<int>(1, source);
 	}
 
-	int reverseConvert(vector<int>&& value) {
+	static int reverseConvert(vector<int>&& value) {
 		if (value.size() > 0) {
 			return move(value.at(0));
 		} else {
@@ -489,12 +489,12 @@ void test9() {
 
 template<> struct ValueConverter<list<float>, vector<int>> {
 
-	void convert(const list<float>& source, vector<int>& target) {
+	static void convert(const list<float>& source, vector<int>& target) {
 		target.clear();
 		target.insert(target.begin(), source.begin(), source.end());
 	}
 
-	list<float> reverseConvert(vector<int>&& value) {
+	static list<float> reverseConvert(vector<int>&& value) {
 		return move(list<float>(value.begin(), value.end()));
 	}
 
@@ -586,12 +586,12 @@ void test11() {
 
 template<> struct ValueConverter<vector<int>, list<float>> {
 
-	void convert(const vector<int>& source, list<float>& target) {
+	static void convert(const vector<int>& source, list<float>& target) {
 		target.clear();
 		target.insert(target.begin(), source.begin(), source.end());
 	}
 
-	vector<int> reverseConvert(list<float>&& value) {
+	static vector<int> reverseConvert(list<float>&& value) {
 		return move(vector<int>(value.begin(), value.end()));
 	}
 
@@ -636,30 +636,8 @@ void test12() {
 	SafeAssert(mfl0.get() == list<float>(3, 111));
 }
 
-template<typename S, typename T, bool Convertible = is_convertible<S, T>::value && is_convertible<T, S>::value>
-struct BindingSelector {
-	typedef DataBinding<S, T, Convertible> Type;
-};
-
-void test0() {
-
-	int s1 = sizeof(BindingSelector<int, int>::Type);
-	assert(16 == s1);
-
-	int s2 = sizeof(BindingSelector<int, Integer>::Type);
-	assert(16 == s2);
-
-	int s3 = sizeof(BindingSelector<Double, Integer>::Type);
-	assert(20 == s3);
-
-	int s4 = sizeof(BindingSelector<vector<int>, list<float>>::Type);
-	assert(20 == s4);
-}
-
 int main()
 {
-	test0();
-
 	test1();
 
 	mi0.set(11); cout << endl;

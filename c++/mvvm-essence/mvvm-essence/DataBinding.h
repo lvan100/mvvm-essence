@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <type_traits>
 using namespace std;
 
 #include "PrintHelper.h"
@@ -22,20 +21,23 @@ namespace mvvm {
 		 */
 		template<typename S, typename T> struct ValueConverter {
 
-			void convert(const S& source, T& target) {
+			static void convert(const S& source, T& target) {
 				target = (T)source;
 			}
 
-			S reverseConvert(T&& value) {
+			static S reverseConvert(T&& value) {
 				return move(S(move(value)));
 			}
 
 		};
 
+		/**
+		 * 数据绑定的实现
+		 */
 		template<typename S, typename T>
-		class BaseBinding : public IDataBinding<T> {
+		class DataBinding : public IDataBinding<T> {
 
-		protected:
+		private:
 			/**
 			 * 数据绑定的源对象
 			 */
@@ -51,11 +53,19 @@ namespace mvvm {
 			 */
 			BindingType type;
 
-		protected:
-			BaseBinding(BindingType type, IModel<S>* source) {
+		private:
+			DataBinding(BindingType type, IModel<S>* source) {
 				this->source = source;
 				this->type = type;
 			}
+
+			/**
+			 * 禁止使用栈类型是基于临时变量跨范围使用会崩溃的考虑。
+			 */
+
+			template<typename S, typename T>
+			friend unique_ptr<DataBinding<S, T>>
+			make_binding(BindingType type, IModel<S>* source);
 
 		public:
 			BindingType getType() {
@@ -84,6 +94,22 @@ namespace mvvm {
 			}
 
 		public:
+			virtual void refresh() override {
+				PrintHelper::Print(this->toString().append(":refresh"));
+				return ValueConverter<S, T>::convert(source->get(), const_cast<T&>(target->get()));
+			}
+
+			virtual void set(T&& value) override {
+				PrintHelper::EnterPrint(this->toString().append(":setValue.begin"));
+				{
+					if (getType() == BindingType::TwoWay) {
+						source->set(move(ValueConverter<S, T>::reverseConvert(move(value))));
+					}
+				}
+				PrintHelper::ExitPrint(this->toString().append(":setValue.end"));
+			}
+
+		public:
 			string toString() const {
 				stringstream ss;
 				ss << "DataBinding@" << this;
@@ -92,96 +118,9 @@ namespace mvvm {
 
 		};
 
-		/**
-		 * 数据绑定的实现
-		 */
-		template<typename S, typename T, bool Convertible>
-		class DataBinding {
-		};
-
-		/**
-		 * 数据绑定的实现
-		 */
 		template<typename S, typename T>
-		class DataBinding<S, T, true> : public BaseBinding<S, T> {
-
-		protected:
-			DataBinding(BindingType type, IModel<S>* source)
-				: BaseBinding(type, source) {
-			}
-
-			/**
-			 * 禁止使用栈类型是基于临时变量跨范围使用会崩溃的考虑。
-			 */
-
-			template<typename S, typename T, bool Convertible = true>
-			friend unique_ptr<DataBinding<S, T, Convertible>>
-			make_binding(BindingType type, IModel<S>* source);
-
-		public:
-			virtual void refresh() override {
-				PrintHelper::Print(this->toString().append(":refresh"));
-				const_cast<T&>(target->get()) = T(source->get());
-			}
-
-			virtual void set(T&& value) override {
-				PrintHelper::EnterPrint(this->toString().append(":setValue.begin"));
-				{
-					if (getType() == BindingType::TwoWay) {
-						source->set(move(S(move(value))));
-					}
-				}
-				PrintHelper::ExitPrint(this->toString().append(":setValue.end"));
-			}
-
-		};
-
-		/**
-		 * 数据绑定的实现
-		 */
-		template<typename S, typename T>
-		class DataBinding<S, T, false> : public BaseBinding<S, T> {
-
-		protected:
-			DataBinding(BindingType type, IModel<S>* source)
-				: BaseBinding(type, source) {
-			}
-
-			/**
-			 * 禁止使用栈类型是基于临时变量跨范围使用会崩溃的考虑。
-			 */
-
-			template<typename S, typename T, bool Convertible = false>
-			friend unique_ptr<DataBinding<S, T, Convertible>>
-			make_binding(BindingType type, IModel<S>* source);
-
-		private:
-			/**
-			 * 值转换器
-			 */
-			ValueConverter<S, T> converter = ValueConverter<S, T>();
-
-		public:
-			virtual void refresh() override {
-				PrintHelper::Print(this->toString().append(":refresh"));
-				return converter.convert(source->get(), const_cast<T&>(target->get()));
-			}
-
-			virtual void set(T&& value) override {
-				PrintHelper::EnterPrint(this->toString().append(":setValue.begin"));
-				{
-					if (getType() == BindingType::TwoWay) {
-						source->set(move(converter.reverseConvert(move(value))));
-					}
-				}
-				PrintHelper::ExitPrint(this->toString().append(":setValue.end"));
-			}
-
-		};
-
-		template<typename S, typename T, bool Convertible = is_convertible<S, T>::value && is_convertible<T, S>::value>
-		inline unique_ptr<DataBinding<S, T, Convertible>> make_binding(BindingType type, IModel<S>* source) {
-			return unique_ptr<DataBinding<S, T, Convertible>>(new DataBinding<S, T, Convertible>(type, source));
+		inline unique_ptr<DataBinding<S, T>> make_binding(BindingType type, IModel<S>* source) {
+			return unique_ptr<DataBinding<S, T>>(new DataBinding<S, T>(type, source));
 		}
 
 	}
