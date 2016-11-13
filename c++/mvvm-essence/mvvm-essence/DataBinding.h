@@ -34,7 +34,7 @@ namespace mvvm {
 		/**
 		 * 数据绑定的实现
 		 */
-		template<typename S, typename T>
+		template<typename S, typename T, typename VConv = ValueConverter<S, T>>
 		class DataBinding : public IDataBinding<T> {
 
 		private:
@@ -63,8 +63,8 @@ namespace mvvm {
 			 * 禁止使用栈类型是基于临时变量跨范围使用会崩溃的考虑。
 			 */
 
-			template<typename S, typename T>
-			friend unique_ptr<DataBinding<S, T>>
+			template<typename S, typename T, typename VConv>
+			friend unique_ptr<DataBinding<S, T, VConv>>
 			make_binding(BindingType type, Model<S>* source);
 
 		public:
@@ -96,14 +96,14 @@ namespace mvvm {
 		public:
 			virtual void refresh() override {
 				PrintHelper::Print(this->toString().append(":refresh"));
-				return ValueConverter<S, T>::convert(source->get(), const_cast<T&>(target->get()));
+				return VConv::convert(source->get(), const_cast<T&>(target->get()));
 			}
 
 			virtual void set(T&& value) override {
 				PrintHelper::EnterPrint(this->toString().append(":setValue.begin"));
 				{
 					if (getType() == BindingType::TwoWay) {
-						source->set(move(ValueConverter<S, T>::reverseConvert(move(value))));
+						source->set(move(VConv::reverseConvert(move(value))));
 					}
 				}
 				PrintHelper::ExitPrint(this->toString().append(":setValue.end"));
@@ -118,9 +118,9 @@ namespace mvvm {
 
 		};
 
-		template<typename S, typename T>
-		inline unique_ptr<DataBinding<S, T>> make_binding(BindingType type, Model<S>* source) {
-			return unique_ptr<DataBinding<S, T>>(new DataBinding<S, T>(type, source));
+		template<typename S, typename T, typename VConv = ValueConverter<S, T>>
+		inline unique_ptr<DataBinding<S, T, VConv>> make_binding(BindingType type, Model<S>* source) {
+			return unique_ptr<DataBinding<S, T, VConv>>(new DataBinding<S, T, VConv>(type, source));
 		}
 
 	}

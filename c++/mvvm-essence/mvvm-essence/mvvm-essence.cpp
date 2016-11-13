@@ -381,7 +381,10 @@ void test7_2() {
 	SafeAssert(mD0.get() == 111);
 }
 
-template<> struct ValueConverter<vector<int>, int> {
+/**
+ * 使用非特化模板的值转换器
+ */
+struct IntVectorAndIntValueConverter {
 
 	static void convert(const vector<int>& source, int& target) {
 		if (source.size() > 0) {
@@ -425,7 +428,7 @@ void test8() {
 	SafeAssert(miv0.get() == vector<int>(2, 22));
 	SafeAssert(mi0.get() == 11);
 
-	mi0.setDataBinding(make_binding<vector<int>, int>(BindingType::TwoWay, &miv0));
+	mi0.setDataBinding(make_binding<vector<int>, int, IntVectorAndIntValueConverter>(BindingType::TwoWay, &miv0));
 	cout << endl;
 
 	SafeAssert(miv0.get() == vector<int>(2, 22));
