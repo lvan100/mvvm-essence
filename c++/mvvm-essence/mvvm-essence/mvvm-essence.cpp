@@ -636,8 +636,30 @@ void test12() {
 	SafeAssert(mfl0.get() == list<float>(3, 111));
 }
 
+template<typename S, typename T, bool Convertible = is_convertible<S, T>::value && is_convertible<T, S>::value>
+struct BindingSelector {
+	typedef DataBinding<S, T, Convertible> Type;
+};
+
+void test0() {
+
+	int s1 = sizeof(BindingSelector<int, int>::Type);
+	assert(16 == s1);
+
+	int s2 = sizeof(BindingSelector<int, Integer>::Type);
+	assert(16 == s2);
+
+	int s3 = sizeof(BindingSelector<Double, Integer>::Type);
+	assert(20 == s3);
+
+	int s4 = sizeof(BindingSelector<vector<int>, list<float>>::Type);
+	assert(20 == s4);
+}
+
 int main()
 {
+	test0();
+
 	test1();
 
 	mi0.set(11); cout << endl;
