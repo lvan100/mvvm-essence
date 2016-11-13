@@ -41,12 +41,12 @@ namespace mvvm {
 			/**
 			 * 数据绑定的源对象
 			 */
-			IModel<S>* source;
+			Model<S>* source;
 
 			/**
 			 * 数据绑定的目标对象
 			 */
-			IModel<T>* target;
+			Model<T>* target;
 
 			/**
 			 * 数据绑定的类型
@@ -54,7 +54,7 @@ namespace mvvm {
 			BindingType type;
 
 		private:
-			DataBinding(BindingType type, IModel<S>* source) {
+			DataBinding(BindingType type, Model<S>* source) {
 				this->source = source;
 				this->type = type;
 			}
@@ -65,7 +65,7 @@ namespace mvvm {
 
 			template<typename S, typename T>
 			friend unique_ptr<DataBinding<S, T>>
-			make_binding(BindingType type, IModel<S>* source);
+			make_binding(BindingType type, Model<S>* source);
 
 		public:
 			BindingType getType() {
@@ -76,19 +76,19 @@ namespace mvvm {
 				this.type = type;
 			}
 
-			IModel<S>* getSource() {
+			Model<S>* getSource() {
 				return source;
 			}
 
-			void setSource(IModel<S>* source) {
+			void setSource(Model<S>* source) {
 				this->source = source;
 			}
 
-			virtual IModel<T>* getTarget() override {
+			virtual Model<T>* getTarget() override {
 				return target;
 			}
 
-			virtual void setTarget(IModel<T>* target) override {
+			virtual void setTarget(Model<T>* target) override {
 				source->addNotifyValueChanged(target);
 				this->target = target;
 			}
@@ -119,7 +119,7 @@ namespace mvvm {
 		};
 
 		template<typename S, typename T>
-		inline unique_ptr<DataBinding<S, T>> make_binding(BindingType type, IModel<S>* source) {
+		inline unique_ptr<DataBinding<S, T>> make_binding(BindingType type, Model<S>* source) {
 			return unique_ptr<DataBinding<S, T>>(new DataBinding<S, T>(type, source));
 		}
 

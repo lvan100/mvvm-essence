@@ -1,10 +1,19 @@
 #pragma once
 
-#include "IModel.h"
-using namespace mvvm::model;
+namespace mvvm {
+	namespace model {
+
+		/**
+		 * 声明数据模型类型
+		 */
+		template<typename T> class Model;
+
+	}
+}
 
 namespace mvvm {
 	namespace binding {
+		using namespace model;
 
 		/**
 		 * 数据绑定的定义
@@ -17,8 +26,8 @@ namespace mvvm {
 			virtual void refresh() = 0;
 			virtual void set(T&& value) = 0;
 
-			virtual IModel<T>* getTarget() = 0;
-			virtual void setTarget(IModel<T>* target) = 0;
+			virtual Model<T>* getTarget() = 0;
+			virtual void setTarget(Model<T>* target) = 0;
 
 		};
 

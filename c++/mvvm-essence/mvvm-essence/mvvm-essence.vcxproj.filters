@@ -33,9 +33,6 @@
     <ClInclude Include="DataBinding.h">
       <Filter>mvvm\binding</Filter>
     </ClInclude>
-    <ClInclude Include="IModel.h">
-      <Filter>mvvm\model</Filter>
-    </ClInclude>
     <ClInclude Include="IDataBinding.h">
       <Filter>mvvm\binding</Filter>
     </ClInclude>

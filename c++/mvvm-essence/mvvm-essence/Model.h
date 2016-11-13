@@ -7,17 +7,36 @@
 using namespace std;
 
 #include "PrintHelper.h"
-
 #include "IDataBinding.h"
-using namespace mvvm::binding;
 
 namespace mvvm {
 	namespace model {
+		using namespace binding;
 
 		/**
-		 * 基础数据模型的实现
+		 * 数据模型值变化通知接口
 		 */
-		template<typename T> class Model : public IModel<T> {
+		struct INotifyValueChanged {
+
+			/**
+			 * 通知数据模型已经发生变化
+			 *
+			 * @param mode 发生变化的数据模型
+			 */
+			virtual void onValueChanged(void* model) = 0;
+
+		};
+
+		/**
+		 * 每个数据模型都有自己的数据拷贝，当底层数据发生变化时，立即刷新
+		 * 数据并缓存起来，这样在后续的使用过程中如果底层数据没有发生变化，
+		 * 而需要多次获取模型的值时效率更高，因为不用每次都要执行一遍转换。
+		 */
+
+		/**
+		 * 数据模型的实现
+		 */
+		template<typename T> class Model : public INotifyValueChanged {
 
 		protected:
 			/**
@@ -40,12 +59,15 @@ namespace mvvm {
 			Model(T&& value) : _value(move(value)) {}
 			Model(T&& value, bool readOnly) : _value(move(value)), _readOnly(readOnly) {}
 
-			virtual const T& get() const override {
+			/**
+			 * 返回数据模型值的引用，但是又要限制值不能被修改
+			 */
+			const T& get() const {
 				PrintHelper::Print(this->toString().append(":Model.getValue"));
 				return _value;
 			}
 
-			virtual void set(T&& value) override {
+			void set(T&& value) {
 				PrintHelper::EnterPrint(this->toString().append(":Model.setValue.begin"));
 
 				if (!readOnly()) {
@@ -114,7 +136,7 @@ namespace mvvm {
 			vector<INotifyValueChanged*> notifyList;
 
 		public:
-			virtual void removeNotifyValueChanged(INotifyValueChanged* notify) {
+			void removeNotifyValueChanged(INotifyValueChanged* notify) {
 
 				auto iter = find_if(notifyList.begin(), notifyList.end(),
 					[&notify](INotifyValueChanged* p) {
@@ -126,7 +148,7 @@ namespace mvvm {
 				}
 			}
 
-			virtual void addNotifyValueChanged(INotifyValueChanged* notify) {
+			void addNotifyValueChanged(INotifyValueChanged* notify) {
 				notifyList.push_back(notify);
 			}
 
