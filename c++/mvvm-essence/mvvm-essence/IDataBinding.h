@@ -11,7 +11,10 @@ namespace mvvm {
 		 */
 		template<typename T> struct IDataBinding {
 
-			virtual T get() = 0;
+			/**
+			 * 刷新目标数据模型的值
+			 */
+			virtual void refresh() = 0;
 			virtual void set(T&& value) = 0;
 
 			virtual IModel<T>* getTarget() = 0;

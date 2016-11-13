@@ -147,7 +147,7 @@ namespace mvvm {
 				{
 					PrintHelper::Enter();
 					{
-						this->_value = move(dataBinding->get());
+						dataBinding->refresh();
 
 						stringstream ss_value;
 						ss_value << _value;

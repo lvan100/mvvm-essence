@@ -21,8 +21,8 @@ namespace mvvm {
 		 */
 		template<typename S, typename T> struct ValueConverter {
 
-			T convert(const S& value) {
-				return move(T(value));
+			void convert(const S& source, T& target) {
+				target = (T)source;
 			}
 
 			S reverseConvert(T&& value) {
@@ -100,9 +100,9 @@ namespace mvvm {
 			ValueConverter<S, T> converter = ValueConverter<S, T>();
 
 		public:
-			virtual T get() override {
-				PrintHelper::Print(this->toString().append(":getValue"));
-				return move(converter.convert(source->get()));
+			virtual void refresh() override {
+				PrintHelper::Print(this->toString().append(":refresh"));
+				return converter.convert(source->get(), const_cast<T&>(target->get()));
 			}
 
 			virtual void set(T&& value) override {

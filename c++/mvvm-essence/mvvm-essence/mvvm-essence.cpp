@@ -295,8 +295,8 @@ basic_ostream<char, _Traits>& operator<<(
 
 template<> struct ValueConverter<Double, Integer> {
 
-	Integer convert(const Double& value) {
-		return move(int(value.value));
+	void convert(const Double& source, Integer& target) {
+		target.value = int(source.value);
 	}
 
 	Double reverseConvert(Integer&& value) {
@@ -338,13 +338,54 @@ void test7() {
 	SafeAssert(mI0.get() == 222);
 }
 
+template<> struct ValueConverter<Integer, Double> {
+
+	void convert(const Integer& source, Double& target) {
+		target.value = source.value;
+	}
+
+	Integer reverseConvert(Double&& value) {
+		return move(int(value.value));
+	}
+
+};
+
+void test7_2() {
+
+	Model<Integer> mI0(2);
+	Model<Double> mD0(1.10);
+
+	mI0.addNotifyValueChanged(&printIntegerModel);
+	mD0.addNotifyValueChanged(&printSDoubleModel);
+
+	mI0.set(22); cout << endl;
+	SafeAssert(mI0.get() == 22);
+	SafeAssert(mD0.get() == 1.10);
+
+	mD0.set(11.10); cout << endl;
+	SafeAssert(mI0.get() == 22);
+	SafeAssert(mD0.get() == 11.10);
+
+	mD0.setDataBinding(make_binding<Integer, Double>(BindingType::TwoWay, &mI0));
+	cout << endl;
+
+	SafeAssert(mI0.get() == 22);
+	SafeAssert(mD0.get() == 22);
+
+	mI0.set(222); cout << endl;
+	SafeAssert(mI0.get() == 222);
+	SafeAssert(mD0.get() == 222);
+
+	mD0.set(111.10); cout << endl;
+	SafeAssert(mI0.get() == 111);
+	SafeAssert(mD0.get() == 111);
+}
+
 template<> struct ValueConverter<vector<int>, int> {
 
-	int convert(const vector<int>& value) {
-		if (value.size() > 0) {
-			return move(value.at(0));
-		} else {
-			return 0;
+	void convert(const vector<int>& source, int& target) {
+		if (source.size() > 0) {
+			target = int(source.at(0));
 		}
 	}
 
@@ -401,8 +442,8 @@ void test8() {
 
 template<> struct ValueConverter<int, vector<int>> {
 
-	vector<int> convert(const int& value) {
-		return move(vector<int>(1, value));
+	void convert(const int& source, vector<int>& target) {
+		target = vector<int>(1, source);
 	}
 
 	int reverseConvert(vector<int>&& value) {
@@ -448,8 +489,9 @@ void test9() {
 
 template<> struct ValueConverter<list<float>, vector<int>> {
 
-	vector<int> convert(const list<float>& value) {
-		return move(vector<int>(value.begin(), value.end()));
+	void convert(const list<float>& source, vector<int>& target) {
+		target.clear();
+		target.insert(target.begin(), source.begin(), source.end());
 	}
 
 	list<float> reverseConvert(vector<int>&& value) {
@@ -544,8 +586,9 @@ void test11() {
 
 template<> struct ValueConverter<vector<int>, list<float>> {
 
-	list<float> convert(const vector<int>& value) {
-		return move(list<float>(value.begin(), value.end()));
+	void convert(const vector<int>& source, list<float>& target) {
+		target.clear();
+		target.insert(target.begin(), source.begin(), source.end());
 	}
 
 	vector<int> reverseConvert(list<float>&& value) {
@@ -615,7 +658,9 @@ int main()
 	test2();
 
 	test6();
+
 	test7();
+	test7_2();
 
 	test8();
 	test9();
