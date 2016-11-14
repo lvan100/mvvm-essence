@@ -20,6 +20,11 @@ namespace mvvm {
 		 */
 
 		/**
+		 * 当依赖对象的数据将要发生变化但变化不是由底层数据引起时，首先更
+		 * 新依赖对象的本地数据，然后再决定是否需要将变化传递给绑定对象。
+		 */
+
+		/**
 		 * 数据模型的实现
 		 */
 		template<typename T> class Model : public BaseObservable<INotifyPropertyChanged> {
@@ -30,23 +35,9 @@ namespace mvvm {
 			 */
 			T _value;
 
-			/**
-			 * 是否只读
-			 */
-			bool _readOnly = false;
-			
 		public:
 			// 要求数据类型支持拷贝、移动运算符
 			Model(T&& value) : _value(move(value)) {}
-			Model(T&& value, bool readOnly) : _value(move(value)), _readOnly(readOnly) {}
-
-			bool readOnly() {
-				return _readOnly;
-			}
-
-			void setReadOnly(bool readOnly) {
-				this->_readOnly = readOnly;
-			}
 
 			/**
 			 * 返回数据模型值的引用，但是又要限制值不能被修改
@@ -59,30 +50,27 @@ namespace mvvm {
 			virtual void set(T&& value) {
 				PrintHelper::EnterPrint(this->toString().append(":Model.setValue.begin"));
 				{
-					if (!readOnly()) {
+					stringstream ss_oldValue;
+					ss_oldValue << _value;
 
-						stringstream ss_oldValue;
-						ss_oldValue << _value;
+					stringstream ss_newValue;
+					ss_newValue << value;
 
-						stringstream ss_newValue;
-						ss_newValue << value;
+					PrintHelper::EnterPrint(this->toString().append(":Model.setValue=")
+						.append(ss_oldValue.str()).append("->").append(ss_newValue.str()));
 
-						PrintHelper::EnterPrint(this->toString().append(":Model.setValue=")
-							.append(ss_oldValue.str()).append("->").append(ss_newValue.str()));
+					// 要求数据类型支持!=操作符
+					if (this->_value != value) {
 
-						// 要求数据类型支持!=操作符
-						if (this->_value != value) {
+						// 要求数据类型支持=操作符
+						this->_value = move(value);
 
-							// 要求数据类型支持=操作符
-							this->_value = move(value);
+						PrintHelper::Exit();
 
-							PrintHelper::Exit();
+						notifyPropertyChanged(this, 0, nullptr);
 
-							notifyPropertyChanged(this, 0, nullptr);
-
-						} else {
-							PrintHelper::Exit();
-						}
+					} else {
+						PrintHelper::Exit();
 					}
 				}
 				PrintHelper::ExitPrint(this->toString().append(":Model.setValue.end"));
@@ -131,17 +119,16 @@ namespace mvvm {
 		public:
 			// 要求数据类型支持拷贝、移动运算符
 			DependencyObject(T&& value) : Model(move(value)) {}
-			DependencyObject(T&& value, bool readOnly) : Model(move(value), readOnly) {}
 
 			virtual void set(T&& value) {
 				PrintHelper::EnterPrint(this->toString().append(":DependencyObject.setValue.begin"));
 				{
-					if (!readOnly()) {
-						if (dataBinding.get() != nullptr) {
-							dataBinding->set(move(value));
-						} else {
-							Model::set(move(value));
-						}
+					// 首先更新本地数据
+					T newValue = value;
+					Model::set(move(newValue));
+
+					if (dataBinding.get() != nullptr) {
+						dataBinding->set(move(value));
 					}
 				}
 				PrintHelper::ExitPrint(this->toString().append(":DependencyObject.setValue.end"));
@@ -233,7 +220,6 @@ namespace mvvm {
 		public:
 			// 要求数据类型支持拷贝、移动运算符
 			VectorModel(vector<T>&& value) : DependencyObject(move(value)) {}
-			VectorModel(vector<T>&& value, bool readOnly) : DependencyObject(move(value)，readOnly) {}
 
 			VectorModel& operator=(vector<T>&& _Right) {
 				PrintHelper::Print(this->toString()
@@ -254,18 +240,14 @@ namespace mvvm {
 				PrintHelper::Print(this->toString()
 					.append(":VectorModel.push_back.begin"));
 				{
-					if (!readOnly()) {
-						if (dataBinding.get() == nullptr) {
+					_value.push_back(move(_Val));
 
-							_value.push_back(move(_Val));
+					notifyPropertyChanged(this, 0, nullptr);
 
-							notifyPropertyChanged(this, 0, nullptr);
-
-						} else {
-							#if _ITERATOR_DEBUG_LEVEL == 2
-								_DEBUG_ERROR("not allowed to push value to binded model");
-							#endif /* _ITERATOR_DEBUG_LEVEL == 2 */
-						}
+					if (dataBinding.get() != nullptr) {
+					#if _ITERATOR_DEBUG_LEVEL == 2
+						_DEBUG_ERROR("not allowed to push value to binded model");
+					#endif /* _ITERATOR_DEBUG_LEVEL == 2 */
 					}
 				}
 				PrintHelper::Print(this->toString()
@@ -282,18 +264,14 @@ namespace mvvm {
 				PrintHelper::Print(this->toString()
 					.append(":VectorModel.insert.begin"));
 				{
-					if (!readOnly()) {
-						if (dataBinding.get() == nullptr) {
+					ret = _value.insert(_Where, move(_Val));
 
-							ret = _value.insert(_Where, move(_Val));
+					notifyPropertyChanged(this, 0, nullptr);
 
-							notifyPropertyChanged(this, 0, nullptr);
-
-						} else {
-							#if _ITERATOR_DEBUG_LEVEL == 2
-								_DEBUG_ERROR("not allowed to insert value to binded model");
-							#endif /* _ITERATOR_DEBUG_LEVEL == 2 */
-						}
+					if (dataBinding.get() != nullptr) {
+					#if _ITERATOR_DEBUG_LEVEL == 2
+						_DEBUG_ERROR("not allowed to insert value to binded model");
+					#endif /* _ITERATOR_DEBUG_LEVEL == 2 */
 					}
 				}
 				PrintHelper::Print(this->toString()

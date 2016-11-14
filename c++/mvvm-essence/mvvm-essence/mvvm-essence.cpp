@@ -40,7 +40,7 @@ PrintModel<float> printFloatModel;
 PrintModel<double> printDoubleModel;
 
 Model<int> mi0(1);
-DependencyObject<int> mi1(2), mi2(3, true);
+DependencyObject<int> mi1(2), mi2(3);
 
 void test1() {
 
@@ -57,7 +57,7 @@ void test1() {
 	mi2.set(33); cout << endl;
 	SafeAssert(mi0.get() == 11);
 	SafeAssert(mi1.get() == 22);
-	SafeAssert(mi2.get() == 3);
+	SafeAssert(mi2.get() == 33);
 
 	mi0.addObserver(&printIntModel);
 	mi1.addObserver(&printIntModel);
@@ -66,39 +66,39 @@ void test1() {
 	mi0.set(111); cout << endl;
 	SafeAssert(mi0.get() == 111);
 	SafeAssert(mi1.get() == 22);
-	SafeAssert(mi2.get() == 3);
+	SafeAssert(mi2.get() == 33);
 
 	mi1.set(222); cout << endl;
 	SafeAssert(mi0.get() == 111);
 	SafeAssert(mi1.get() == 222);
-	SafeAssert(mi2.get() == 3);
+	SafeAssert(mi2.get() == 33);
 
 	mi2.set(333); cout << endl;
 	SafeAssert(mi0.get() == 111);
 	SafeAssert(mi1.get() == 222);
-	SafeAssert(mi2.get() == 3);
+	SafeAssert(mi2.get() == 333);
 
 	mi1.setDataBinding(make_binding<int, int>(BindingType::TwoWay, &mi0));
 	cout << endl;
 
 	SafeAssert(mi0.get() == 111);
 	SafeAssert(mi1.get() == 111);
-	SafeAssert(mi2.get() == 3);
+	SafeAssert(mi2.get() == 333);
 
 	mi0.set(11); cout << endl;
 	SafeAssert(mi0.get() == 11);
 	SafeAssert(mi1.get() == 11);
-	SafeAssert(mi2.get() == 3);
+	SafeAssert(mi2.get() == 333);
 
 	mi1.set(22); cout << endl;
 	SafeAssert(mi0.get() == 22);
 	SafeAssert(mi1.get() == 22);
-	SafeAssert(mi2.get() == 3);
+	SafeAssert(mi2.get() == 333);
 
 	mi2.set(33); cout << endl;
 	SafeAssert(mi0.get() == 22);
 	SafeAssert(mi1.get() == 22);
-	SafeAssert(mi2.get() == 3);
+	SafeAssert(mi2.get() == 33);
 
 	mi2.setDataBinding(make_binding<int, int>(BindingType::TwoWay, &mi1));
 	cout << endl;
@@ -118,9 +118,9 @@ void test1() {
 	SafeAssert(mi2.get() == 2);
 
 	mi2.set(3); cout << endl;
-	SafeAssert(mi0.get() == 2);
-	SafeAssert(mi1.get() == 2);
-	SafeAssert(mi2.get() == 2);
+	SafeAssert(mi0.get() == 3);
+	SafeAssert(mi1.get() == 3);
+	SafeAssert(mi2.get() == 3);
 }
 
 void test2() {
@@ -838,9 +838,9 @@ int main()
 	SafeAssert(mi2.get() == 22);
 
 	mi2.set(33); cout << endl;
-	SafeAssert(mi0.get() == 22);
-	SafeAssert(mi1.get() == 22);
-	SafeAssert(mi2.get() == 22);
+	SafeAssert(mi0.get() == 33);
+	SafeAssert(mi1.get() == 33);
+	SafeAssert(mi2.get() == 33);
 
 	test2();
 
