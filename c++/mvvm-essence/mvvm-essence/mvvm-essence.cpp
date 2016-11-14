@@ -640,6 +640,189 @@ void test12() {
 	SafeAssert(mfl0.get() == list<float>(3, 111));
 }
 
+enum Gender {
+	Man, Woman
+};
+
+class Student : public BaseObservable<INotifyPropertyChanged> {
+
+private:
+	Gender _gender;
+	string _name;
+	int _age;
+
+public:
+	void set(Gender gender, string name, int age) {
+		this->_gender = gender;
+		this->_name = name;
+		this->_age = age;
+		notifyPropertyChanged(this, 0, this);
+	}
+
+	Gender getGender() {
+		return _gender;
+	}
+
+	void setGender(Gender gender) {
+		this->_gender = gender;
+		notifyPropertyChanged(this, 1, &_gender);
+	}
+
+	string getName() {
+		return _name;
+	}
+
+	void setName(string name) {
+		this->_name = name;
+		notifyPropertyChanged(this, 2, &_name);
+	}
+
+	int getAge() {
+		return _age;
+	}
+
+	void setAge(int age) {
+		this->_age = age;
+		notifyPropertyChanged(this, 3, &_age);
+	}
+
+};
+
+class StudentView : public INotifyPropertyChanged {
+
+private:
+	Gender gender = Gender::Woman;
+	string name = "lucy";
+	int age = 23;
+
+public:
+	virtual void onPropertyChanged(void* model, int id, void* arg) override {
+		switch (id) {
+		case 0: {
+			Student* stu = (Student*)arg;
+			gender = stu->getGender();
+			name = stu->getName();
+			age = stu->getAge();
+		}
+			break;
+		case 1: {
+			gender = *(Gender*)arg;
+		}
+			break;
+		case 2: {
+			name = *(string*)arg;
+		}
+			break;
+		case 3: {
+			age = *(int*)arg;
+		}
+			break;
+		default:
+			break;
+		}
+
+		PrintHelper::Print(this->toString());
+	}
+
+public:
+	string toString() const {
+		stringstream ss;
+
+		ss << "StudentView@" << this << ":{";
+		ss << "Gender=" << gender << ',';
+		ss << "Name=" << name << ',';
+		ss << "Age=" << age << '}';
+
+		return ss.str();
+	}
+
+};
+
+void test13() {
+
+	Student student;
+	StudentView stuView;
+
+	cout << stuView.toString() << endl << endl;
+
+	student.addObserver(&stuView);
+
+	student.setAge(11); cout << endl;
+	student.setName("jack"); cout << endl;
+	student.setGender(Gender::Man); cout << endl;
+
+	student.set(Gender::Woman, "piter", 40); cout << endl;
+}
+
+class Student2 {
+
+public:
+	Model<Gender> gender;
+	Model<string> name;
+	Model<int> age;
+
+	Student2() : gender(Gender::Woman)
+		, name("lucy")
+		, age(23) {
+	}
+};
+
+class StudentView2 :public INotifyPropertyChanged {
+
+public:
+	DependencyObject<Gender> gender;
+	DependencyObject<string> name;
+	DependencyObject<int> age;
+
+	StudentView2() : gender(Gender::Man)
+		, name("jack"), age(11) {
+
+		gender.addObserver(this);
+		name.addObserver(this);
+		age.addObserver(this);
+	}
+
+	virtual void onPropertyChanged(void* model, int id, void* arg) override {
+		PrintHelper::Enter();
+		PrintHelper::Print(this->toString());
+		PrintHelper::Exit();
+	}
+
+public:
+	string toString() const {
+		stringstream ss;
+
+		ss << "StudentView2@" << this << ":{";
+		ss << "Gender=" << gender.get() << ',';
+		ss << "Name=" << name.get() << ',';
+		ss << "Age=" << age.get() << '}';
+
+		return ss.str();
+	}
+
+};
+
+void test14() {
+
+	Student2 student;
+	StudentView2 stuView;
+
+	cout << stuView.toString() << endl << endl;
+
+	stuView.gender.setDataBinding(make_binding<Gender, Gender>(BindingType::OneWay, &student.gender));
+	cout << endl;
+
+	stuView.name.setDataBinding(make_binding<string, string>(BindingType::OneWay, &student.name));
+	cout << endl;
+
+	stuView.age.setDataBinding(make_binding<int, int>(BindingType::OneWay, &student.age));
+	cout << endl;
+
+	student.age.set(11); cout << endl;
+	student.name.set("jack"); cout << endl;
+	student.gender.set(Gender::Man); cout << endl;
+}
+
 int main()
 {
 	test1();
@@ -673,6 +856,9 @@ int main()
 
 	test11();
 	test12();
+
+	test13();
+	test14();
 
 	return 0;
 }
