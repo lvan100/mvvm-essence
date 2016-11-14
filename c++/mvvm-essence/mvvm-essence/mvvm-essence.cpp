@@ -15,9 +15,9 @@ using namespace mvvm::binding;
 
 #define SafeAssert(x) PrintHelper::Close(); assert(x); PrintHelper::Open()
 
-template<typename T> struct PrintModel : public INotifyValueChanged {
+template<typename T> struct PrintModel : public INotifyPropertyChanged {
 
-	virtual void onValueChanged(void* model) override {
+	virtual void onPropertyChanged(void* model, int id, void* arg) override {
 		PrintHelper::Enter();
 
 		stringstream ss_model;
@@ -39,7 +39,8 @@ PrintModel<int> printIntModel;
 PrintModel<float> printFloatModel;
 PrintModel<double> printDoubleModel;
 
-Model<int> mi0(1), mi1(2), mi2(3, true);
+Model<int> mi0(1);
+DependencyObject<int> mi1(2), mi2(3, true);
 
 void test1() {
 
@@ -58,9 +59,9 @@ void test1() {
 	SafeAssert(mi1.get() == 22);
 	SafeAssert(mi2.get() == 3);
 
-	mi0.addNotifyValueChanged(&printIntModel);
-	mi1.addNotifyValueChanged(&printIntModel);
-	mi2.addNotifyValueChanged(&printIntModel);
+	mi0.addObserver(&printIntModel);
+	mi1.addObserver(&printIntModel);
+	mi2.addObserver(&printIntModel);
 
 	mi0.set(111); cout << endl;
 	SafeAssert(mi0.get() == 111);
@@ -125,10 +126,10 @@ void test1() {
 void test2() {
 
 	Model<int> mi0(1);
-	Model<float> mf0(2.20f);
+	DependencyObject<float> mf0(2.20f);
 
-	mi0.addNotifyValueChanged(&printIntModel);
-	mf0.addNotifyValueChanged(&printFloatModel);
+	mi0.addObserver(&printIntModel);
+	mf0.addObserver(&printFloatModel);
 
 	mi0.set(11); cout << endl;
 	SafeAssert(mi0.get() == 11);
@@ -187,10 +188,10 @@ PrintModel<Integer> printIntegerModel;
 void test6() {
 
 	Model<int> mi0(1);
-	Model<Integer> mI0(2);
+	DependencyObject<Integer> mI0(2);
 
-	mi0.addNotifyValueChanged(&printIntModel);
-	mI0.addNotifyValueChanged(&printIntegerModel);
+	mi0.addObserver(&printIntModel);
+	mI0.addObserver(&printIntegerModel);
 
 	mi0.set(11); cout << endl;
 	SafeAssert(mi0.get() == 11);
@@ -310,10 +311,10 @@ PrintModel<Double> printSDoubleModel;
 void test7() {
 
 	Model<Double> mD0(1.10);
-	Model<Integer> mI0(2);
+	DependencyObject<Integer> mI0(2);
 
-	mD0.addNotifyValueChanged(&printSDoubleModel);
-	mI0.addNotifyValueChanged(&printIntegerModel);
+	mD0.addObserver(&printSDoubleModel);
+	mI0.addObserver(&printIntegerModel);
 
 	mD0.set(11.10); cout << endl;
 	SafeAssert(mD0.get() == 11.10);
@@ -353,10 +354,10 @@ template<> struct ValueConverter<Integer, Double> {
 void test7_2() {
 
 	Model<Integer> mI0(2);
-	Model<Double> mD0(1.10);
+	DependencyObject<Double> mD0(1.10);
 
-	mI0.addNotifyValueChanged(&printIntegerModel);
-	mD0.addNotifyValueChanged(&printSDoubleModel);
+	mI0.addObserver(&printIntegerModel);
+	mD0.addObserver(&printSDoubleModel);
 
 	mI0.set(22); cout << endl;
 	SafeAssert(mI0.get() == 22);
@@ -415,10 +416,10 @@ PrintModel<vector<int>> printIntVectorModel;
 void test8() {
 
 	Model<vector<int>> miv0(vector<int>(2, 2));
-	Model<int> mi0(1);
+	DependencyObject<int> mi0(1);
 
-	miv0.addNotifyValueChanged(&printIntVectorModel);
-	mi0.addNotifyValueChanged(&printIntModel);
+	miv0.addObserver(&printIntVectorModel);
+	mi0.addObserver(&printIntModel);
 
 	miv0.set(vector<int>(2, 22)); cout << endl;
 	SafeAssert(miv0.get() == vector<int>(2, 22));
@@ -462,10 +463,10 @@ template<> struct ValueConverter<int, vector<int>> {
 void test9() {
 
 	Model<int> mi0(1);
-	Model<vector<int>> miv0(vector<int>(2, 2));
+	DependencyObject<vector<int>> miv0(vector<int>(2, 2));
 
-	mi0.addNotifyValueChanged(&printIntModel);
-	miv0.addNotifyValueChanged(&printIntVectorModel);
+	mi0.addObserver(&printIntModel);
+	miv0.addObserver(&printIntVectorModel);
 
 	mi0.set(11); cout << endl;
 	SafeAssert(mi0.get() == 11);
@@ -520,10 +521,10 @@ PrintModel<list<float>> printFloatListModel;
 void test10() {
 
 	Model<list<float>> mfl0(list<float>(3, 1.1f));
-	Model<vector<int>> miv0(vector<int>(2, 2));
+	DependencyObject<vector<int>> miv0(vector<int>(2, 2));
 
-	mfl0.addNotifyValueChanged(&printFloatListModel);
-	miv0.addNotifyValueChanged(&printIntVectorModel);
+	mfl0.addObserver(&printFloatListModel);
+	miv0.addObserver(&printIntVectorModel);
 
 	mfl0.set(list<float>(3, 11.1f)); cout << endl;
 	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
@@ -553,8 +554,8 @@ void test11() {
 	Model<list<float>> mfl0(list<float>(3, 1.1f));
 	VectorModel<int> miv0(vector<int>(2, 2));
 
-	mfl0.addNotifyValueChanged(&printFloatListModel);
-	miv0.addNotifyValueChanged(&printIntVectorModel);
+	mfl0.addObserver(&printFloatListModel);
+	miv0.addObserver(&printIntVectorModel);
 
 	mfl0.set(list<float>(3, 11.1f)); cout << endl;
 	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
@@ -603,10 +604,10 @@ template<> struct ValueConverter<vector<int>, list<float>> {
 void test12() {
 
 	VectorModel<int> miv0(vector<int>(2, 2));
-	Model<list<float>> mfl0(list<float>(3, 1.1f));
+	DependencyObject<list<float>> mfl0(list<float>(3, 1.1f));
 
-	miv0.addNotifyValueChanged(&printIntVectorModel);
-	mfl0.addNotifyValueChanged(&printFloatListModel);
+	miv0.addObserver(&printIntVectorModel);
+	mfl0.addObserver(&printFloatListModel);
 
 	miv0 = vector<int>(2, 22); cout << endl;
 	SafeAssert(miv0.get() == vector<int>(2, 22));

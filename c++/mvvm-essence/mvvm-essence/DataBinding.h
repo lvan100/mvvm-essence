@@ -44,14 +44,14 @@ namespace mvvm {
 			Model<S>* source;
 
 			/**
-			 * 数据绑定的目标对象
-			 */
-			Model<T>* target;
-
-			/**
 			 * 数据绑定的类型
 			 */
 			BindingType type;
+
+			/**
+			 * 数据绑定的目标对象
+			 */
+			DependencyObject<T>* target;
 
 		private:
 			DataBinding(BindingType type, Model<S>* source) {
@@ -84,12 +84,12 @@ namespace mvvm {
 				this->source = source;
 			}
 
-			virtual Model<T>* getTarget() override {
+			virtual DependencyObject<T>* getTarget() override {
 				return target;
 			}
 
-			virtual void setTarget(Model<T>* target) override {
-				source->addNotifyValueChanged(target);
+			virtual void setTarget(DependencyObject<T>* target) override {
+				source->addObserver(target);
 				this->target = target;
 			}
 

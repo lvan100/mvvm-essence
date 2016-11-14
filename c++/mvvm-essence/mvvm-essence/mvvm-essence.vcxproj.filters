@@ -36,6 +36,9 @@
     <ClInclude Include="IDataBinding.h">
       <Filter>mvvm\binding</Filter>
     </ClInclude>
+    <ClInclude Include="Observable.h">
+      <Filter>mvvm\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mvvm-essence.cpp">

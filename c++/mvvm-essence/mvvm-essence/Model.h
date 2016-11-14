@@ -1,11 +1,11 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <sstream>
 #include <algorithm>
 using namespace std;
 
+#include "Observable.h"
 #include "PrintHelper.h"
 #include "IDataBinding.h"
 
@@ -14,21 +14,7 @@ namespace mvvm {
 		using namespace binding;
 
 		/**
-		 * 数据模型值变化通知接口
-		 */
-		struct INotifyValueChanged {
-
-			/**
-			 * 通知数据模型已经发生变化
-			 *
-			 * @param mode 发生变化的数据模型
-			 */
-			virtual void onValueChanged(void* model) = 0;
-
-		};
-
-		/**
-		 * 每个数据模型都有自己的数据拷贝，当底层数据发生变化时，立即刷新
+		 * 每个依赖对象都有自己的数据拷贝，当底层数据发生变化时，立即刷新
 		 * 数据并缓存起来，这样在后续的使用过程中如果底层数据没有发生变化，
 		 * 而需要多次获取模型的值时效率更高，因为不用每次都要执行一遍转换。
 		 */
@@ -36,7 +22,7 @@ namespace mvvm {
 		/**
 		 * 数据模型的实现
 		 */
-		template<typename T> class Model : public INotifyValueChanged {
+		template<typename T> class Model : public BaseObservable<INotifyPropertyChanged> {
 
 		protected:
 			/**
@@ -48,16 +34,19 @@ namespace mvvm {
 			 * 是否只读
 			 */
 			bool _readOnly = false;
-
-			/**
-			 * 数据绑定对象
-			 */
-			unique_ptr<IDataBinding<T>> dataBinding;
-
+			
 		public:
 			// 要求数据类型支持拷贝、移动运算符
 			Model(T&& value) : _value(move(value)) {}
 			Model(T&& value, bool readOnly) : _value(move(value)), _readOnly(readOnly) {}
+
+			bool readOnly() {
+				return _readOnly;
+			}
+
+			void setReadOnly(bool readOnly) {
+				this->_readOnly = readOnly;
+			}
 
 			/**
 			 * 返回数据模型值的引用，但是又要限制值不能被修改
@@ -67,11 +56,10 @@ namespace mvvm {
 				return _value;
 			}
 
-			void set(T&& value) {
+			virtual void set(T&& value) {
 				PrintHelper::EnterPrint(this->toString().append(":Model.setValue.begin"));
-
-				if (!readOnly()) {
-					if (dataBinding.get() == nullptr) {
+				{
+					if (!readOnly()) {
 
 						stringstream ss_oldValue;
 						ss_oldValue << _value;
@@ -90,119 +78,17 @@ namespace mvvm {
 
 							PrintHelper::Exit();
 
-							notifyValueChanged();
+							notifyPropertyChanged(this, 0, nullptr);
 
 						} else {
 							PrintHelper::Exit();
 						}
-
-					} else {
-						dataBinding->set(move(value));
 					}
 				}
-
 				PrintHelper::ExitPrint(this->toString().append(":Model.setValue.end"));
 			}
 
-			bool readOnly() {
-				return _readOnly;
-			}
-
-			void setReadOnly(bool readOnly) {
-				this->_readOnly = readOnly;
-			}
-
-			unique_ptr<IDataBinding<T>>& getDataBinding() {
-				return dataBinding;
-			}
-
-			void setDataBinding(unique_ptr<IDataBinding<T>> binding) {
-				PrintHelper::EnterPrint(this->toString()
-					.append(":Model.setDataBinding.begin"));
-				{
-					dataBinding.reset(binding.release());
-					dataBinding->setTarget(this);
-
-					this->refreshData();
-				}
-				PrintHelper::ExitPrint(this->toString()
-					.append(":Model.setDataBinding.end"));
-			}
-
-		private:
-			/**
-			 * 值变化通知列表
-			 */
-			vector<INotifyValueChanged*> notifyList;
-
 		public:
-			void removeNotifyValueChanged(INotifyValueChanged* notify) {
-
-				auto iter = find_if(notifyList.begin(), notifyList.end(),
-					[&notify](INotifyValueChanged* p) {
-					return p == notify;
-				});
-
-				if (iter != notifyList.end()) {
-					notifyList.erase(iter);
-				}
-			}
-
-			void addNotifyValueChanged(INotifyValueChanged* notify) {
-				notifyList.push_back(notify);
-			}
-
-			virtual void onValueChanged(void* model) override {
-				PrintHelper::EnterPrint(this->toString()
-					.append(":Model.onValueChanged.begin"));
-
-				this->refreshData();
-
-				PrintHelper::ExitPrint(this->toString()
-					.append(":Model.onValueChanged.end"));
-			}
-
-		private:
-			void refreshData() {
-				PrintHelper::EnterPrint(this->toString()
-					.append(":Model.refreshData.begin"));
-				{
-					PrintHelper::Enter();
-					{
-						dataBinding->refresh();
-
-						stringstream ss_value;
-						ss_value << _value;
-
-						PrintHelper::Print(this->toString()
-							.append(":refreshValue=")
-							.append(ss_value.str()));
-					}
-					PrintHelper::Exit();
-				}
-				PrintHelper::ExitPrint(this->toString()
-					.append(":Model.refreshData.end"));
-
-				notifyValueChanged();
-			}
-
-		public:
-			void notifyValueChanged() {
-				PrintHelper::EnterPrint(this->toString()
-					.append(":Model.notifyValueChanged.begin"));
-				{
-					for (INotifyValueChanged* notify : notifyList) {
-						PrintHelper::EnterPrint(":Notify.onValueChanged.begin");
-						{
-							notify->onValueChanged(this);
-						}
-						PrintHelper::ExitPrint(":Notify.onValueChanged.end");
-					}
-				}
-				PrintHelper::ExitPrint(this->toString()
-					.append(":Model.notifyValueChanged.end"));
-			}
-
 			string toString() const {
 				stringstream ss;
 				ss << "Model@" << this;
@@ -230,14 +116,124 @@ namespace mvvm {
 		};
 
 		/**
-		 * 集合数据模型的实现
+		 * 依赖对象的实现
 		 */
-		template<typename T> class VectorModel : public Model<vector<T>> {
+		template<typename T> class DependencyObject
+			: public Model<T> /* 必须首位继承 */
+			, public INotifyPropertyChanged {
+
+		protected:
+			/**
+			 * 数据绑定对象
+			 */
+			unique_ptr<IDataBinding<T>> dataBinding;
 
 		public:
 			// 要求数据类型支持拷贝、移动运算符
-			VectorModel(vector<T>&& value) : Model(move(value)) {}
-			VectorModel(vector<T>&& value, bool readOnly) : Model(move(value)，readOnly) {}
+			DependencyObject(T&& value) : Model(move(value)) {}
+			DependencyObject(T&& value, bool readOnly) : Model(move(value), readOnly) {}
+
+			virtual void set(T&& value) {
+				PrintHelper::EnterPrint(this->toString().append(":DependencyObject.setValue.begin"));
+				{
+					if (!readOnly()) {
+						if (dataBinding.get() != nullptr) {
+							dataBinding->set(move(value));
+						} else {
+							Model::set(move(value));
+						}
+					}
+				}
+				PrintHelper::ExitPrint(this->toString().append(":DependencyObject.setValue.end"));
+			}
+
+			unique_ptr<IDataBinding<T>>& getDataBinding() {
+				return dataBinding;
+			}
+
+			void setDataBinding(unique_ptr<IDataBinding<T>> binding) {
+				PrintHelper::EnterPrint(this->toString()
+					.append(":DependencyObject.setDataBinding.begin"));
+				{
+					dataBinding.reset(binding.release());
+					dataBinding->setTarget(this);
+
+					this->refreshData();
+				}
+				PrintHelper::ExitPrint(this->toString()
+					.append(":DependencyObject.setDataBinding.end"));
+			}
+
+			virtual void onPropertyChanged(void* model, int id, void* arg) override {
+				PrintHelper::EnterPrint(this->toString()
+					.append(":DependencyObject.onPropertyChanged.begin"));
+
+				this->refreshData();
+
+				PrintHelper::ExitPrint(this->toString()
+					.append(":DependencyObject.onPropertyChanged.end"));
+			}
+
+		private:
+			void refreshData() {
+				PrintHelper::EnterPrint(this->toString()
+					.append(":DependencyObject.refreshData.begin"));
+				{
+					PrintHelper::Enter();
+					{
+						dataBinding->refresh();
+
+						stringstream ss_value;
+						ss_value << _value;
+
+						PrintHelper::Print(this->toString()
+							.append(":refreshValue=")
+							.append(ss_value.str()));
+					}
+					PrintHelper::Exit();
+				}
+				PrintHelper::ExitPrint(this->toString()
+					.append(":DependencyObject.refreshData.end"));
+
+				notifyPropertyChanged(this, 0, nullptr);
+			}
+
+		public:
+			string toString() const {
+				stringstream ss;
+				ss << "DependencyObject@" << this;
+				return ss.str();
+			}
+
+		};
+
+		/**
+		 * 针对指针特化的依赖对象的实现
+		 */
+		template<typename T> class DependencyObject<T*> {
+
+			// 我认为不应该实现对指针的依赖对象
+
+		};
+
+		/**
+		 * 针对引用特化的依赖对象的实现
+		 */
+		template<typename T> class DependencyObject<T&> {
+
+			// 我认为不应该实现对引用的依赖对象
+
+		};
+
+		/**
+		 * 集合数据模型的实现
+		 */
+		template<typename T> class VectorModel : public DependencyObject<vector<T>> {
+
+		public:
+			// 要求数据类型支持拷贝、移动运算符
+			VectorModel(vector<T>&& value) : DependencyObject(move(value)) {}
+			VectorModel(vector<T>&& value, bool readOnly) : DependencyObject(move(value)，readOnly) {}
 
 			VectorModel& operator=(vector<T>&& _Right) {
 				PrintHelper::Print(this->toString()
@@ -263,7 +259,7 @@ namespace mvvm {
 
 							_value.push_back(move(_Val));
 
-							notifyValueChanged();
+							notifyPropertyChanged(this, 0, nullptr);
 
 						} else {
 							#if _ITERATOR_DEBUG_LEVEL == 2
@@ -291,7 +287,7 @@ namespace mvvm {
 
 							ret = _value.insert(_Where, move(_Val));
 
-							notifyValueChanged();
+							notifyPropertyChanged(this, 0, nullptr);
 
 						} else {
 							#if _ITERATOR_DEBUG_LEVEL == 2
