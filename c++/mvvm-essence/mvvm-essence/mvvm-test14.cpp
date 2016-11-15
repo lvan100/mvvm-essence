@@ -23,6 +23,7 @@ namespace {
 			, name("lucy")
 			, age(23) {
 		}
+
 	};
 
 	class StudentView {
@@ -52,35 +53,82 @@ namespace {
 		string toString() const {
 			stringstream ss;
 
-			ss << "StudentView2@" << this << ":{";
-			ss << "Gender=" << gender.get() << ',';
-			ss << "Name=" << name.get() << ',';
-			ss << "Age=" << age.get() << '}';
+			PrintHelper::Close();
+			{
+				ss << "StudentView2@" << this << ":{";
+				ss << "Gender=" << gender.get() << ',';
+				ss << "Name=" << name.get() << ',';
+				ss << "Age=" << age.get() << '}';
+			}
+			PrintHelper::Open();
 
 			return ss.str();
 		}
 
 	};
 
+	/*****************************************************************
+
+	<MainWindow>
+		<StudentView id="myStudentView" gender="{student.gender OneWay}"
+			name="{student.name OneWay}" age="{student.age OneWay}" />
+	</MainWindow>
+
+	*******************************************************************/
+
+	namespace UI {
+
+		template<typename ViewModel> class MainWindow {
+
+		private:
+			StudentView* myStudentView;
+
+		public:
+			void InitUI(ViewModel* vm) {
+
+				myStudentView = new StudentView();
+				cout << myStudentView->toString() << endl << endl;
+
+				make_binding(&vm->student.gender, &myStudentView->gender, BindingType::OneWay);
+				cout << endl;
+
+				make_binding(&vm->student.name, &myStudentView->name, BindingType::OneWay);
+				cout << endl;
+
+				make_binding(&vm->student.age, &myStudentView->age, BindingType::OneWay);
+				cout << endl;
+			}
+
+		};
+
+	}
+
+	namespace ViewModel {
+
+		class MainWindow {
+			friend class UI::MainWindow<MainWindow>;
+
+		private:
+			UI::MainWindow<MainWindow> mainWindow;
+			Student student = Student();
+
+		public:
+			MainWindow() {
+				mainWindow.InitUI(this);
+			}
+
+			void onButtonClick() {
+				student.age.set(11); cout << endl;
+				student.name.set("jack"); cout << endl;
+				student.gender.set(Gender::Man); cout << endl;
+			}
+
+		};
+	}
+
 }
 
 void test14() {
-
-	Student student;
-	StudentView stuView;
-
-	cout << stuView.toString() << endl << endl;
-
-	make_binding(&student.gender, &stuView.gender, BindingType::OneWay);
-	cout << endl;
-
-	make_binding(&student.name, &stuView.name, BindingType::OneWay);
-	cout << endl;
-
-	make_binding(&student.age, &stuView.age, BindingType::OneWay);
-	cout << endl;
-
-	student.age.set(11); cout << endl;
-	student.name.set("jack"); cout << endl;
-	student.gender.set(Gender::Man); cout << endl;
+	ViewModel::MainWindow viewModel;
+	viewModel.onButtonClick();
 }
