@@ -16,14 +16,11 @@
     <Filter Include="mvvm\binding">
       <UniqueIdentifier>{5adf4326-68bd-407a-b4a6-544373b73e5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="useless">
+      <UniqueIdentifier>{891537c5-f961-432c-ace1-e3f21d078a53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>application</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>application</Filter>
-    </ClInclude>
     <ClInclude Include="PrintHelper.h">
       <Filter>utilities</Filter>
     </ClInclude>
@@ -39,12 +36,27 @@
     <ClInclude Include="Observable.h">
       <Filter>mvvm\model</Filter>
     </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>useless</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>useless</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mvvm-essence.cpp">
       <Filter>application</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
+      <Filter>useless</Filter>
+    </ClCompile>
+    <ClCompile Include="PrintHelper.cpp">
+      <Filter>utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="mvvm-test13.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="mvvm-test14.cpp">
       <Filter>application</Filter>
     </ClCompile>
   </ItemGroup>

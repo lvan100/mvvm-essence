@@ -35,7 +35,21 @@ template<typename T> struct PrintModel : public INotifyPropertyChanged {
 
 };
 
-PrintModel<int> printIntModel;
+LambdaObserver printIntModel([](void* model, int id, void* arg) {
+
+	PrintHelper::Enter();
+
+	stringstream ss;
+	ss << "LambdaObserver@" << "";
+
+	stringstream ss_model;
+	ss_model << ((Model<int>*)model)->get();
+
+	PrintHelper::Print(ss.str().append(":").append(ss_model.str()));
+	PrintHelper::Exit();
+
+});
+
 PrintModel<float> printFloatModel;
 PrintModel<double> printDoubleModel;
 
@@ -78,7 +92,7 @@ void test1() {
 	SafeAssert(mi1.get() == 222);
 	SafeAssert(mi2.get() == 333);
 
-	mi1.setDataBinding(make_binding<int, int>(BindingType::TwoWay, &mi0));
+	make_binding(&mi0, &mi1, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(mi0.get() == 111);
@@ -100,7 +114,7 @@ void test1() {
 	SafeAssert(mi1.get() == 22);
 	SafeAssert(mi2.get() == 33);
 
-	mi2.setDataBinding(make_binding<int, int>(BindingType::TwoWay, &mi1));
+	make_binding(&mi1, &mi2, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(mi0.get() == 22);
@@ -139,7 +153,7 @@ void test2() {
 	SafeAssert(mi0.get() == 11);
 	SafeAssert(mf0.get() == 22.20f);
 
-	mf0.setDataBinding(make_binding<int, float>(BindingType::TwoWay, &mi0));
+	make_binding(&mi0, &mf0, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(mi0.get() == 11);
@@ -201,7 +215,7 @@ void test6() {
 	SafeAssert(mi0.get() == 11);
 	SafeAssert(mI0.get() == 22);
 
-	mI0.setDataBinding(make_binding<int, Integer>(BindingType::TwoWay, &mi0));
+	make_binding(&mi0, &mI0, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(mi0.get() == 11);
@@ -324,7 +338,7 @@ void test7() {
 	SafeAssert(mD0.get() == 11.10);
 	SafeAssert(mI0.get() == 22);
 
-	mI0.setDataBinding(make_binding<Double, Integer>(BindingType::TwoWay, &mD0));
+	make_binding(&mD0, &mI0, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(mD0.get() == 11.10);
@@ -367,7 +381,7 @@ void test7_2() {
 	SafeAssert(mI0.get() == 22);
 	SafeAssert(mD0.get() == 11.10);
 
-	mD0.setDataBinding(make_binding<Integer, Double>(BindingType::TwoWay, &mI0));
+	make_binding(&mI0, &mD0, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(mI0.get() == 22);
@@ -429,7 +443,7 @@ void test8() {
 	SafeAssert(miv0.get() == vector<int>(2, 22));
 	SafeAssert(mi0.get() == 11);
 
-	mi0.setDataBinding(make_binding<vector<int>, int, IntVectorAndIntValueConverter>(BindingType::TwoWay, &miv0));
+	make_binding<vector<int>, int, IntVectorAndIntValueConverter>(&miv0, &mi0, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(miv0.get() == vector<int>(2, 22));
@@ -476,7 +490,7 @@ void test9() {
 	SafeAssert(mi0.get() == 11);
 	SafeAssert(miv0.get() == vector<int>(2, 22));
 
-	miv0.setDataBinding(make_binding<int, vector<int>>(BindingType::TwoWay, &mi0));
+	make_binding(&mi0, &miv0, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(mi0.get() == 11);
@@ -534,7 +548,7 @@ void test10() {
 	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
 	SafeAssert(miv0.get() == vector<int>(2, 22));
 
-	miv0.setDataBinding(make_binding<list<float>, vector<int>>(BindingType::TwoWay, &mfl0));
+	make_binding(&mfl0, &miv0, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
@@ -565,7 +579,7 @@ void test11() {
 	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
 	SafeAssert(miv0.get() == vector<int>(2, 22));
 
-	miv0.setDataBinding(make_binding<list<float>, vector<int>>(BindingType::TwoWay, &mfl0));
+	make_binding(&mfl0, &miv0, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
@@ -617,7 +631,7 @@ void test12() {
 	SafeAssert(miv0.get() == vector<int>(2, 22));
 	SafeAssert(mfl0.get() == list<float>(3, 11.1f));
 
-	mfl0.setDataBinding(make_binding<vector<int>, list<float>>(BindingType::TwoWay, &miv0));
+	make_binding(&miv0, &mfl0, BindingType::TwoWay);
 	cout << endl;
 
 	SafeAssert(miv0.get() == vector<int>(2, 22));
@@ -638,189 +652,6 @@ void test12() {
 	mfl0.set(list<float>(3, 111.1f)); cout << endl;
 	SafeAssert(miv0.get() == vector<int>(3, 111));
 	SafeAssert(mfl0.get() == list<float>(3, 111));
-}
-
-enum Gender {
-	Man, Woman
-};
-
-class Student : public BaseObservable<INotifyPropertyChanged> {
-
-private:
-	Gender _gender;
-	string _name;
-	int _age;
-
-public:
-	void set(Gender gender, string name, int age) {
-		this->_gender = gender;
-		this->_name = name;
-		this->_age = age;
-		notifyPropertyChanged(this, 0, this);
-	}
-
-	Gender getGender() {
-		return _gender;
-	}
-
-	void setGender(Gender gender) {
-		this->_gender = gender;
-		notifyPropertyChanged(this, 1, &_gender);
-	}
-
-	string getName() {
-		return _name;
-	}
-
-	void setName(string name) {
-		this->_name = name;
-		notifyPropertyChanged(this, 2, &_name);
-	}
-
-	int getAge() {
-		return _age;
-	}
-
-	void setAge(int age) {
-		this->_age = age;
-		notifyPropertyChanged(this, 3, &_age);
-	}
-
-};
-
-class StudentView : public INotifyPropertyChanged {
-
-private:
-	Gender gender = Gender::Woman;
-	string name = "lucy";
-	int age = 23;
-
-public:
-	virtual void onPropertyChanged(void* model, int id, void* arg) override {
-		switch (id) {
-		case 0: {
-			Student* stu = (Student*)arg;
-			gender = stu->getGender();
-			name = stu->getName();
-			age = stu->getAge();
-		}
-			break;
-		case 1: {
-			gender = *(Gender*)arg;
-		}
-			break;
-		case 2: {
-			name = *(string*)arg;
-		}
-			break;
-		case 3: {
-			age = *(int*)arg;
-		}
-			break;
-		default:
-			break;
-		}
-
-		PrintHelper::Print(this->toString());
-	}
-
-public:
-	string toString() const {
-		stringstream ss;
-
-		ss << "StudentView@" << this << ":{";
-		ss << "Gender=" << gender << ',';
-		ss << "Name=" << name << ',';
-		ss << "Age=" << age << '}';
-
-		return ss.str();
-	}
-
-};
-
-void test13() {
-
-	Student student;
-	StudentView stuView;
-
-	cout << stuView.toString() << endl << endl;
-
-	student.addObserver(&stuView);
-
-	student.setAge(11); cout << endl;
-	student.setName("jack"); cout << endl;
-	student.setGender(Gender::Man); cout << endl;
-
-	student.set(Gender::Woman, "piter", 40); cout << endl;
-}
-
-class Student2 {
-
-public:
-	Model<Gender> gender;
-	Model<string> name;
-	Model<int> age;
-
-	Student2() : gender(Gender::Woman)
-		, name("lucy")
-		, age(23) {
-	}
-};
-
-class StudentView2 :public INotifyPropertyChanged {
-
-public:
-	DependencyObject<Gender> gender;
-	DependencyObject<string> name;
-	DependencyObject<int> age;
-
-	StudentView2() : gender(Gender::Man)
-		, name("jack"), age(11) {
-
-		gender.addObserver(this);
-		name.addObserver(this);
-		age.addObserver(this);
-	}
-
-	virtual void onPropertyChanged(void* model, int id, void* arg) override {
-		PrintHelper::Enter();
-		PrintHelper::Print(this->toString());
-		PrintHelper::Exit();
-	}
-
-public:
-	string toString() const {
-		stringstream ss;
-
-		ss << "StudentView2@" << this << ":{";
-		ss << "Gender=" << gender.get() << ',';
-		ss << "Name=" << name.get() << ',';
-		ss << "Age=" << age.get() << '}';
-
-		return ss.str();
-	}
-
-};
-
-void test14() {
-
-	Student2 student;
-	StudentView2 stuView;
-
-	cout << stuView.toString() << endl << endl;
-
-	stuView.gender.setDataBinding(make_binding<Gender, Gender>(BindingType::OneWay, &student.gender));
-	cout << endl;
-
-	stuView.name.setDataBinding(make_binding<string, string>(BindingType::OneWay, &student.name));
-	cout << endl;
-
-	stuView.age.setDataBinding(make_binding<int, int>(BindingType::OneWay, &student.age));
-	cout << endl;
-
-	student.age.set(11); cout << endl;
-	student.name.set("jack"); cout << endl;
-	student.gender.set(Gender::Man); cout << endl;
 }
 
 int main()
@@ -857,7 +688,9 @@ int main()
 	test11();
 	test12();
 
+	extern void test13();
 	test13();
+	extern void test14();
 	test14();
 
 	return 0;

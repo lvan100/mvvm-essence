@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 using namespace std;
 
 namespace mvvm {
@@ -19,6 +20,35 @@ namespace mvvm {
 			 * @param arg  属性的参数
 			 */
 			virtual void onPropertyChanged(void* model, int id, void* arg) = 0;
+
+		};
+
+		/**
+		 * 封装Lambda表达式的观察者
+		 */
+		class LambdaObserver : public INotifyPropertyChanged {
+
+		private:
+			function<void(void*, int, void*)> func;
+
+		public:
+			LambdaObserver() {}
+
+			template<typename Lambda>
+			LambdaObserver(Lambda l) {
+				func = bind(l, placeholders::_1, placeholders::_2, placeholders::_3);
+			}
+
+			template<typename Lambda>
+			void set(Lambda l) {
+				func = bind(l, placeholders::_1, placeholders::_2, placeholders::_3);
+			}
+
+			virtual void onPropertyChanged(void* model, int id, void* arg) override {
+				if (func != nullptr) {
+					func(model, id, arg);
+				}
+			}
 
 		};
 

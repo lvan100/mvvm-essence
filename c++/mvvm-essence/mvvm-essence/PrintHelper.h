@@ -47,6 +47,3 @@ public:
 	}
 
 };
-
-int PrintHelper::deep = -1;
-bool PrintHelper::show = true;

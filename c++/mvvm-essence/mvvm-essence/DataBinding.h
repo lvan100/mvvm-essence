@@ -63,9 +63,8 @@ namespace mvvm {
 			 * 禁止使用栈类型是基于临时变量跨范围使用会崩溃的考虑。
 			 */
 
-			template<typename S, typename T, typename VConv>
-			friend unique_ptr<DataBinding<S, T, VConv>>
-			make_binding(BindingType type, Model<S>* source);
+			template<typename S, typename T, typename VConv >
+			friend void make_binding(Model<S>* source, DependencyObject<T>* target, BindingType type);
 
 		public:
 			BindingType getType() {
@@ -119,8 +118,9 @@ namespace mvvm {
 		};
 
 		template<typename S, typename T, typename VConv = ValueConverter<S, T>>
-		inline unique_ptr<DataBinding<S, T, VConv>> make_binding(BindingType type, Model<S>* source) {
-			return unique_ptr<DataBinding<S, T, VConv>>(new DataBinding<S, T, VConv>(type, source));
+		inline void make_binding(Model<S>* source, DependencyObject<T>* target, BindingType type) {
+			DataBinding<S, T, VConv>* ptr = new DataBinding<S, T, VConv>(type, source);
+			target->setDataBinding(unique_ptr<DataBinding<S, T, VConv>>(ptr));
 		}
 
 	}
