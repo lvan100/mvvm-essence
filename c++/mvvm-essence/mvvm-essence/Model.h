@@ -14,14 +14,14 @@ namespace mvvm {
 		using namespace binding;
 
 		/**
-		 * 每个依赖对象都有自己的数据拷贝，当底层数据发生变化时，立即刷新
-		 * 数据并缓存起来，这样在后续的使用过程中如果底层数据没有发生变化，
-		 * 而需要多次获取模型的值时效率更高，因为不用每次都要执行一遍转换。
+		 * 每个属性都有自己的数据拷贝，当底层数据发生变化时，立即刷新数据
+		 * 并缓存起来，这样在后续的使用过程中如果底层数据没有发生变化，而
+		 * 需要多次获取模型的值时效率更高，因为不用每次都要执行一遍转换。
 		 */
 
 		/**
-		 * 当依赖对象的数据将要发生变化但变化不是由底层数据引起时，首先更
-		 * 新依赖对象的本地数据，然后再决定是否需要将变化传递给绑定对象。
+		 * 当属性的数据将要发生变化但变化不是由底层数据引起时，首先更新属
+		 * 性的本地数据，然后再决定是否需要将变化传递给绑定的模型或属性。
 		 */
 
 		/**
@@ -104,9 +104,9 @@ namespace mvvm {
 		};
 
 		/**
-		 * 依赖对象的实现
+		 * 属性的实现
 		 */
-		template<typename T> class DependencyObject
+		template<typename T> class Property
 			: public Model<T> /* 必须首位继承 */
 			, public INotifyPropertyChanged {
 
@@ -118,10 +118,10 @@ namespace mvvm {
 
 		public:
 			// 要求数据类型支持拷贝、移动运算符
-			DependencyObject(T&& value) : Model(move(value)) {}
+			Property(T&& value) : Model(move(value)) {}
 
 			virtual void set(T&& value) {
-				PrintHelper::EnterPrint(this->toString().append(":DependencyObject.setValue.begin"));
+				PrintHelper::EnterPrint(this->toString().append(":Property.setValue.begin"));
 				{
 					// 首先更新本地数据
 					T newValue = value;
@@ -131,7 +131,7 @@ namespace mvvm {
 						dataBinding->set(move(value));
 					}
 				}
-				PrintHelper::ExitPrint(this->toString().append(":DependencyObject.setValue.end"));
+				PrintHelper::ExitPrint(this->toString().append(":Property.setValue.end"));
 			}
 
 			unique_ptr<IDataBinding<T>>& getDataBinding() {
@@ -140,7 +140,7 @@ namespace mvvm {
 
 			void setDataBinding(unique_ptr<IDataBinding<T>> binding) {
 				PrintHelper::EnterPrint(this->toString()
-					.append(":DependencyObject.setDataBinding.begin"));
+					.append(":Property.setDataBinding.begin"));
 				{
 					dataBinding.reset(binding.release());
 					dataBinding->setTarget(this);
@@ -148,23 +148,23 @@ namespace mvvm {
 					this->refreshData();
 				}
 				PrintHelper::ExitPrint(this->toString()
-					.append(":DependencyObject.setDataBinding.end"));
+					.append(":Property.setDataBinding.end"));
 			}
 
 			virtual void onPropertyChanged(void* model, int id, void* arg) override {
 				PrintHelper::EnterPrint(this->toString()
-					.append(":DependencyObject.onPropertyChanged.begin"));
+					.append(":Property.onPropertyChanged.begin"));
 
 				this->refreshData();
 
 				PrintHelper::ExitPrint(this->toString()
-					.append(":DependencyObject.onPropertyChanged.end"));
+					.append(":Property.onPropertyChanged.end"));
 			}
 
 		private:
 			void refreshData() {
 				PrintHelper::EnterPrint(this->toString()
-					.append(":DependencyObject.refreshData.begin"));
+					.append(":Property.refreshData.begin"));
 				{
 					PrintHelper::Enter();
 					{
@@ -180,7 +180,7 @@ namespace mvvm {
 					PrintHelper::Exit();
 				}
 				PrintHelper::ExitPrint(this->toString()
-					.append(":DependencyObject.refreshData.end"));
+					.append(":Property.refreshData.end"));
 
 				notifyPropertyChanged(this, 0, nullptr);
 			}
@@ -188,38 +188,38 @@ namespace mvvm {
 		public:
 			string toString() const {
 				stringstream ss;
-				ss << "DependencyObject@" << this;
+				ss << "Property@" << this;
 				return ss.str();
 			}
 
 		};
 
 		/**
-		 * 针对指针特化的依赖对象的实现
+		 * 针对指针特化的属性的实现
 		 */
-		template<typename T> class DependencyObject<T*> {
+		template<typename T> class Property<T*> {
 
-			// 我认为不应该实现对指针的依赖对象
+			// 我认为不应该实现对指针的属性
 
 		};
 
 		/**
-		 * 针对引用特化的依赖对象的实现
+		 * 针对引用特化的属性的实现
 		 */
-		template<typename T> class DependencyObject<T&> {
+		template<typename T> class Property<T&> {
 
-			// 我认为不应该实现对引用的依赖对象
+			// 我认为不应该实现对引用的属性
 
 		};
 
 		/**
 		 * 集合数据模型的实现
 		 */
-		template<typename T> class VectorModel : public DependencyObject<vector<T>> {
+		template<typename T> class VectorModel : public Property<vector<T>> {
 
 		public:
 			// 要求数据类型支持拷贝、移动运算符
-			VectorModel(vector<T>&& value) : DependencyObject(move(value)) {}
+			VectorModel(vector<T>&& value) : Property(move(value)) {}
 
 			VectorModel& operator=(vector<T>&& _Right) {
 				PrintHelper::Print(this->toString()

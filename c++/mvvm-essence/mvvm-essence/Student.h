@@ -10,9 +10,9 @@ enum Gender {
 class Student {
 
 public:
-	Model<Gender> gender;
-	Model<string> name;
 	Model<int> age;
+	Model<string> name;
+	Model<Gender> gender;
 
 	Student() : gender(Gender::Woman)
 		, name("lucy")

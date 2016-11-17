@@ -51,7 +51,7 @@ namespace mvvm {
 			/**
 			 * 数据绑定的目标对象
 			 */
-			DependencyObject<T>* target;
+			Property<T>* target;
 
 		private:
 			DataBinding(BindingType type, Model<S>* source) {
@@ -64,7 +64,7 @@ namespace mvvm {
 			 */
 
 			template<typename S, typename T, typename VConv >
-			friend void make_binding(Model<S>* source, DependencyObject<T>* target, BindingType type);
+			friend void make_binding(Model<S>* source, Property<T>* target, BindingType type);
 
 		public:
 			BindingType getType() {
@@ -83,11 +83,11 @@ namespace mvvm {
 				this->source = source;
 			}
 
-			virtual DependencyObject<T>* getTarget() override {
+			virtual Property<T>* getTarget() override {
 				return target;
 			}
 
-			virtual void setTarget(DependencyObject<T>* target) override {
+			virtual void setTarget(Property<T>* target) override {
 				source->addObserver(target);
 				this->target = target;
 			}
@@ -118,7 +118,7 @@ namespace mvvm {
 		};
 
 		template<typename S, typename T, typename VConv = ValueConverter<S, T>>
-		inline void make_binding(Model<S>* source, DependencyObject<T>* target, BindingType type) {
+		inline void make_binding(Model<S>* source, Property<T>* target, BindingType type) {
 			DataBinding<S, T, VConv>* ptr = new DataBinding<S, T, VConv>(type, source);
 			target->setDataBinding(unique_ptr<DataBinding<S, T, VConv>>(ptr));
 		}

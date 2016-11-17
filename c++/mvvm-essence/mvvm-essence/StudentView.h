@@ -16,11 +16,11 @@ class StudentView
 	typedef UI::UI_StudentView<StudentView> BaseUI;
 
 public:
-	LambdaObserver observer;
+	Property<int> age;
+	Property<string> name;
+	Property<Gender> gender;
 
-	DependencyObject<int> age;
-	DependencyObject<string> name;
-	DependencyObject<Gender> gender;
+	LambdaObserver observer;
 
 	StudentView() : gender(Gender::Man)
 		, name("jack"), age(11) {

@@ -4,7 +4,7 @@ namespace mvvm {
 	namespace model {
 
 		template<typename T> class Model;
-		template<typename T> class DependencyObject;
+		template<typename T> class Property;
 
 	}
 }
@@ -19,13 +19,13 @@ namespace mvvm {
 		template<typename T> struct IDataBinding {
 
 			/**
-			 * 刷新目标依赖对象的值
+			 * 刷新目标属性的值
 			 */
 			virtual void refresh() = 0;
 			virtual void set(T&& value) = 0;
 
-			virtual DependencyObject<T>* getTarget() = 0;
-			virtual void setTarget(DependencyObject<T>* target) = 0;
+			virtual Property<T>* getTarget() = 0;
+			virtual void setTarget(Property<T>* target) = 0;
 
 		};
 

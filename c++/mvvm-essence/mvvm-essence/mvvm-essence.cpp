@@ -54,7 +54,7 @@ PrintModel<float> printFloatModel;
 PrintModel<double> printDoubleModel;
 
 Model<int> mi0(1);
-DependencyObject<int> mi1(2), mi2(3);
+Property<int> mi1(2), mi2(3);
 
 void test1() {
 
@@ -140,7 +140,7 @@ void test1() {
 void test2() {
 
 	Model<int> mi0(1);
-	DependencyObject<float> mf0(2.20f);
+	Property<float> mf0(2.20f);
 
 	mi0.addObserver(&printIntModel);
 	mf0.addObserver(&printFloatModel);
@@ -202,7 +202,7 @@ PrintModel<Integer> printIntegerModel;
 void test6() {
 
 	Model<int> mi0(1);
-	DependencyObject<Integer> mI0(2);
+	Property<Integer> mI0(2);
 
 	mi0.addObserver(&printIntModel);
 	mI0.addObserver(&printIntegerModel);
@@ -325,7 +325,7 @@ PrintModel<Double> printSDoubleModel;
 void test7() {
 
 	Model<Double> mD0(1.10);
-	DependencyObject<Integer> mI0(2);
+	Property<Integer> mI0(2);
 
 	mD0.addObserver(&printSDoubleModel);
 	mI0.addObserver(&printIntegerModel);
@@ -368,7 +368,7 @@ template<> struct ValueConverter<Integer, Double> {
 void test7_2() {
 
 	Model<Integer> mI0(2);
-	DependencyObject<Double> mD0(1.10);
+	Property<Double> mD0(1.10);
 
 	mI0.addObserver(&printIntegerModel);
 	mD0.addObserver(&printSDoubleModel);
@@ -430,7 +430,7 @@ PrintModel<vector<int>> printIntVectorModel;
 void test8() {
 
 	Model<vector<int>> miv0(vector<int>(2, 2));
-	DependencyObject<int> mi0(1);
+	Property<int> mi0(1);
 
 	miv0.addObserver(&printIntVectorModel);
 	mi0.addObserver(&printIntModel);
@@ -477,7 +477,7 @@ template<> struct ValueConverter<int, vector<int>> {
 void test9() {
 
 	Model<int> mi0(1);
-	DependencyObject<vector<int>> miv0(vector<int>(2, 2));
+	Property<vector<int>> miv0(vector<int>(2, 2));
 
 	mi0.addObserver(&printIntModel);
 	miv0.addObserver(&printIntVectorModel);
@@ -535,7 +535,7 @@ PrintModel<list<float>> printFloatListModel;
 void test10() {
 
 	Model<list<float>> mfl0(list<float>(3, 1.1f));
-	DependencyObject<vector<int>> miv0(vector<int>(2, 2));
+	Property<vector<int>> miv0(vector<int>(2, 2));
 
 	mfl0.addObserver(&printFloatListModel);
 	miv0.addObserver(&printIntVectorModel);
@@ -618,7 +618,7 @@ template<> struct ValueConverter<vector<int>, list<float>> {
 void test12() {
 
 	VectorModel<int> miv0(vector<int>(2, 2));
-	DependencyObject<list<float>> mfl0(list<float>(3, 1.1f));
+	Property<list<float>> mfl0(list<float>(3, 1.1f));
 
 	miv0.addObserver(&printIntVectorModel);
 	mfl0.addObserver(&printFloatListModel);
