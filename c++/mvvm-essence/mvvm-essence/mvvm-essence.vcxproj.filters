@@ -19,6 +19,18 @@
     <Filter Include="useless">
       <UniqueIdentifier>{891537c5-f961-432c-ace1-e3f21d078a53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="test14">
+      <UniqueIdentifier>{a700ff28-abfc-44d4-8fbf-c75d45923ad3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test14\UI">
+      <UniqueIdentifier>{cb8f8342-5d20-43e6-8404-8150b1228f9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test14\UI\Classes">
+      <UniqueIdentifier>{cdf86adc-968c-4eb1-9188-8075a7911d8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test14\Model">
+      <UniqueIdentifier>{63103b06-4716-43a1-80bd-6d028e3e2bfc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PrintHelper.h">
@@ -42,6 +54,22 @@
     <ClInclude Include="stdafx.h">
       <Filter>useless</Filter>
     </ClInclude>
+    <ClInclude Include="UI\Classes\UI_MainWindow.h">
+      <Filter>test14\UI\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Student.h">
+      <Filter>test14\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Classes\UI_StudentView.h">
+      <Filter>test14\UI\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentView.h">
+      <Filter>test14</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>test14</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseView.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mvvm-essence.cpp">
@@ -59,5 +87,13 @@
     <ClCompile Include="mvvm-test14.cpp">
       <Filter>application</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="UI\MainWindow.xml">
+      <Filter>test14\UI</Filter>
+    </Xml>
+    <Xml Include="UI\StudentView.xml">
+      <Filter>test14\UI</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

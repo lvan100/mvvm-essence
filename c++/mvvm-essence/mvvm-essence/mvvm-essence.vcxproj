@@ -71,6 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>UI\Classes;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -145,11 +146,17 @@
   <ItemGroup>
     <ClInclude Include="DataBinding.h" />
     <ClInclude Include="IDataBinding.h" />
+    <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Observable.h" />
     <ClInclude Include="PrintHelper.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Student.h" />
+    <ClInclude Include="StudentView.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="UI\Classes\UI_StudentView.h" />
+    <ClInclude Include="UI\Classes\UI_MainWindow.h" />
+    <ClInclude Include="BaseView.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mvvm-essence.cpp" />
@@ -162,6 +169,10 @@
     </ClCompile>
     <ClCompile Include="mvvm-test13.cpp" />
     <ClCompile Include="mvvm-test14.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="UI\MainWindow.xml" />
+    <Xml Include="UI\StudentView.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

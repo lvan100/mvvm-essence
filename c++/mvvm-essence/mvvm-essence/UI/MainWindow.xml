@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xml>
+  
+  <Import>
+    <Header>../../StudentView.h</Header>
+  </Import>
+
+  <MainWindow>
+    <StudentView export="true" id="myStudentView" gender="{student.gender OneWay}"
+                 name="{student.name OneWay}" age="{student.age OneWay}" />
+  </MainWindow>
+
+</xml>
