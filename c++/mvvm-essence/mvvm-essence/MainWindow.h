@@ -13,7 +13,7 @@ private:
 	Student student;
 
 public:
-	MainWindow() {
+	MainWindow(BaseView* parent) : BaseView(parent) {
 		BaseUI::InitUI(this);
 	}
 

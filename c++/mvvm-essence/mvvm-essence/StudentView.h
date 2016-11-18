@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Student.h"
+
 #include "BaseView.h"
+using namespace Framework;
 
 #include "DataBinding.h"
 using namespace mvvm::binding;
@@ -22,8 +24,11 @@ public:
 
 	LambdaObserver observer;
 
-	StudentView() : gender(Gender::Man)
-		, name("jack"), age(11) {
+	StudentView(BaseView* parent)
+		: BaseView(parent)
+		, gender(Gender::Man)
+		, name("jack")
+		, age(11) {
 
 		BaseUI::InitUI(this);
 

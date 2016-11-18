@@ -2,6 +2,6 @@
 #include "MainWindow.h"
 
 void test14() {
-	MainWindow viewModel;
+	MainWindow viewModel(nullptr);
 	viewModel.onButtonClick();
 }

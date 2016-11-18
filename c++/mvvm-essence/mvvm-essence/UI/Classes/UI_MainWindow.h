@@ -12,7 +12,7 @@ namespace UI {
 	protected:
 		void InitUI(TrueView* view) {
 
-			myStudentView = new StudentView();
+			myStudentView = new StudentView(view);
 			cout << myStudentView->toString() << endl << endl;
 
 			make_binding(&view->student.gender, &myStudentView->gender, BindingType::OneWay);
