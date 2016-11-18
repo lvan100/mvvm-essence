@@ -1,43 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="application">
-      <UniqueIdentifier>{e52230de-2b0b-45d7-97b5-39bfb299a0b3}</UniqueIdentifier>
+    <Filter Include="useless">
+      <UniqueIdentifier>{8326855b-120c-417d-b3e8-01ece5655599}</UniqueIdentifier>
     </Filter>
-    <Filter Include="utilities">
-      <UniqueIdentifier>{68916056-4f61-4ddf-a2f2-9ded4c593657}</UniqueIdentifier>
+    <Filter Include="utility">
+      <UniqueIdentifier>{b8ebcbe8-3be1-49af-94f6-f15a41ebdf10}</UniqueIdentifier>
     </Filter>
     <Filter Include="mvvm">
-      <UniqueIdentifier>{d3e8393d-8c9d-44fc-8f2d-6dd68be340fa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="mvvm\model">
-      <UniqueIdentifier>{e6872b0a-60ca-42a2-914d-2cb47fc61128}</UniqueIdentifier>
+      <UniqueIdentifier>{bee98404-2826-442f-83e4-910316b5faca}</UniqueIdentifier>
     </Filter>
     <Filter Include="mvvm\binding">
-      <UniqueIdentifier>{5adf4326-68bd-407a-b4a6-544373b73e5f}</UniqueIdentifier>
+      <UniqueIdentifier>{3d5c3c81-497a-4b6b-852e-00ee1ed90b2b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="useless">
-      <UniqueIdentifier>{891537c5-f961-432c-ace1-e3f21d078a53}</UniqueIdentifier>
+    <Filter Include="mvvm\model">
+      <UniqueIdentifier>{03963d35-6e1c-4f35-bf5c-5f3906486f5c}</UniqueIdentifier>
     </Filter>
     <Filter Include="test14">
-      <UniqueIdentifier>{a700ff28-abfc-44d4-8fbf-c75d45923ad3}</UniqueIdentifier>
+      <UniqueIdentifier>{c8b00024-340e-4c14-b0f9-94e642725dba}</UniqueIdentifier>
     </Filter>
     <Filter Include="test14\UI">
-      <UniqueIdentifier>{cb8f8342-5d20-43e6-8404-8150b1228f9b}</UniqueIdentifier>
+      <UniqueIdentifier>{6d051832-0a02-4564-9e04-713bd08ee32f}</UniqueIdentifier>
     </Filter>
     <Filter Include="test14\UI\Classes">
-      <UniqueIdentifier>{cdf86adc-968c-4eb1-9188-8075a7911d8b}</UniqueIdentifier>
+      <UniqueIdentifier>{6c6ec347-d0f6-40e9-ae9f-6f1eae870989}</UniqueIdentifier>
     </Filter>
     <Filter Include="test14\Model">
-      <UniqueIdentifier>{63103b06-4716-43a1-80bd-6d028e3e2bfc}</UniqueIdentifier>
+      <UniqueIdentifier>{6f8f8b2c-0782-421c-915a-9759ecccbd93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test14\View">
+      <UniqueIdentifier>{daccd465-4f8e-49d9-96eb-75cc0ac21642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{9097c058-27f5-4d61-a001-c44653070fc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Windows">
+      <UniqueIdentifier>{b14b3568-2b66-47c1-8da3-408147bd14ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application">
+      <UniqueIdentifier>{e1901ebe-2e94-46a0-bbeb-fd2b136d5c18}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PrintHelper.h">
-      <Filter>utilities</Filter>
+    <ClInclude Include="targetver.h">
+      <Filter>useless</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>mvvm\model</Filter>
+    <ClInclude Include="stdafx.h">
+      <Filter>useless</Filter>
+    </ClInclude>
+    <ClInclude Include="PrintHelper.h">
+      <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="DataBinding.h">
       <Filter>mvvm\binding</Filter>
@@ -45,47 +57,83 @@
     <ClInclude Include="IDataBinding.h">
       <Filter>mvvm\binding</Filter>
     </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>mvvm\model</Filter>
+    </ClInclude>
     <ClInclude Include="Observable.h">
       <Filter>mvvm\model</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>useless</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>useless</Filter>
-    </ClInclude>
     <ClInclude Include="UI\Classes\UI_MainWindow.h">
+      <Filter>test14\UI\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Classes\UI_StudentView.h">
       <Filter>test14\UI\Classes</Filter>
     </ClInclude>
     <ClInclude Include="Student.h">
       <Filter>test14\Model</Filter>
     </ClInclude>
-    <ClInclude Include="UI\Classes\UI_StudentView.h">
-      <Filter>test14\UI\Classes</Filter>
-    </ClInclude>
+    <ClInclude Include="BaseView.h" />
     <ClInclude Include="StudentView.h">
-      <Filter>test14</Filter>
+      <Filter>test14\View</Filter>
     </ClInclude>
     <ClInclude Include="MainWindow.h">
-      <Filter>test14</Filter>
+      <Filter>test14\View</Filter>
     </ClInclude>
-    <ClInclude Include="BaseView.h" />
+    <ClInclude Include="..\Framework\Windows\WinApp.h">
+      <Filter>Framework\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework\Windows\WinWnd.h">
+      <Filter>Framework\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework\Application.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework\Window.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework\Drawable.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework\Windows\WinDrawable.h">
+      <Filter>Framework\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework\AppInit.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mvvm-essence.cpp">
-      <Filter>application</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>useless</Filter>
     </ClCompile>
-    <ClCompile Include="PrintHelper.cpp">
-      <Filter>utilities</Filter>
+    <ClCompile Include="mvvm-essence.cpp">
+      <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="mvvm-test13.cpp">
-      <Filter>application</Filter>
+    <ClCompile Include="PrintHelper.cpp">
+      <Filter>utility</Filter>
     </ClCompile>
     <ClCompile Include="mvvm-test14.cpp">
-      <Filter>application</Filter>
+      <Filter>test14</Filter>
+    </ClCompile>
+    <ClCompile Include="mvvm-test001.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="mvvm-test013.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework\Windows\WinWnd.cpp">
+      <Filter>Framework\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework\Application.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework\Windows\WinLibs.cpp">
+      <Filter>Framework\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework\Windows\WinDrawable.cpp">
+      <Filter>Framework\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework\Windows\WinApp.cpp">
+      <Filter>Framework\Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
