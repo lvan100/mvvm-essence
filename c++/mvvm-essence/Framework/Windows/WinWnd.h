@@ -10,7 +10,7 @@ namespace Framework {
 		class Win32Window {
 
 		public:
-			Win32Window(WCHAR* title);
+			Win32Window();
 			virtual ~Win32Window();
 
 			void UpdateFrame();
@@ -25,7 +25,9 @@ namespace Framework {
 			void OnSize();
 
 		public:
+			Drawable* m_DefaultBackgnd;
 			Drawable* m_Backgnd = nullptr;
+
 			HBITMAP m_hMemBitmap = nullptr;
 
 		};

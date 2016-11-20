@@ -149,7 +149,10 @@
     <ClInclude Include="..\Framework\Windows\WinDrawable.h" />
     <ClInclude Include="..\Framework\Windows\WinWnd.h" />
     <ClInclude Include="BaseView.h" />
+    <ClInclude Include="Classes\DemoApplication.h" />
+    <ClInclude Include="Classes\DemoWindow.h" />
     <ClInclude Include="DataBinding.h" />
+    <ClInclude Include="DemoWindow.h" />
     <ClInclude Include="IDataBinding.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Model.h" />
@@ -191,6 +194,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="DemoApplication.xml" />
+    <Xml Include="DemoWindow.xml" />
     <Xml Include="UI\MainWindow.xml" />
     <Xml Include="UI\StudentView.xml" />
   </ItemGroup>

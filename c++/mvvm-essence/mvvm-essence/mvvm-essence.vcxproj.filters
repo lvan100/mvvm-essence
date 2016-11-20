@@ -40,6 +40,15 @@
     <Filter Include="Application">
       <UniqueIdentifier>{e1901ebe-2e94-46a0-bbeb-fd2b136d5c18}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DemoApplication">
+      <UniqueIdentifier>{a5d88d9d-82cd-459f-b6a0-0ebea8c524ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DemoApplication\Classes">
+      <UniqueIdentifier>{b0e6e649-1264-4ab8-9769-6cbed13feac6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DemoApplication\XML">
+      <UniqueIdentifier>{81486692-9ad3-463f-96ca-a917c230bb7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -100,6 +109,15 @@
     <ClInclude Include="..\Framework\AppInit.h">
       <Filter>Framework</Filter>
     </ClInclude>
+    <ClInclude Include="Classes\DemoApplication.h">
+      <Filter>DemoApplication\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\DemoWindow.h">
+      <Filter>DemoApplication\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoWindow.h">
+      <Filter>DemoApplication</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -142,6 +160,12 @@
     </Xml>
     <Xml Include="UI\StudentView.xml">
       <Filter>test14\UI</Filter>
+    </Xml>
+    <Xml Include="DemoApplication.xml">
+      <Filter>DemoApplication\XML</Filter>
+    </Xml>
+    <Xml Include="DemoWindow.xml">
+      <Filter>DemoApplication\XML</Filter>
     </Xml>
   </ItemGroup>
 </Project>

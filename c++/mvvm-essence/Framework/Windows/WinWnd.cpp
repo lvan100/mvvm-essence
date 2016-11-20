@@ -111,7 +111,7 @@ namespace {
 		}
 	}
 
-	HWND AfxCreateWindow(Win32Window* window, WCHAR* title) {
+	HWND AfxCreateWindow(Win32Window* window) {
 
 		EnsureRegisterWndClass();
 
@@ -124,21 +124,47 @@ namespace {
 			WS_MINIMIZEBOX | WS_MAXIMIZEBOX |
 			WS_THICKFRAME | WS_OVERLAPPED;
 
-		return CreateWindowExW(dwExStyle, szWindowClass, title,
+		return CreateWindowExW(dwExStyle, szWindowClass, nullptr,
 			dwStyle, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr,
 			nullptr, AfxGetApp()->m_hInstance, window);
 	}
 
 }
 
+namespace {
+
+	class DefaultWndBkgnd : public Drawable {
+
+		virtual void Draw(Graphics& graph, Rect rect) {
+
+			graph.FillRectangle(new Gdiplus::SolidBrush(Gdiplus::Color(10, 0, 0, 0)),
+				0, 0, rect.Width, rect.Height);
+
+			graph.FillRectangle(new Gdiplus::SolidBrush(Gdiplus::Color(200, 214, 219, 233)),
+				borderX, borderY, rect.Width - borderX * 2, rect.Height - borderY * 2);
+
+			graph.FillRectangle(new Gdiplus::SolidBrush(Gdiplus::Color(255, 255, 255, 255)),
+				borderX + 1, borderY + captionY + 1, rect.Width - borderX * 2 - 2,
+				rect.Height - borderY * 2 - captionY - 2);
+
+			graph.DrawRectangle(new Pen(Color(13, 32, 45), 0.5f), borderX, borderY,
+				rect.Width - borderX * 2, rect.Height - borderY * 2);
+		}
+
+	};
+
+}
+
 namespace Framework {
 	namespace Windows {
 
-		Win32Window::Win32Window(WCHAR* title) {
-			m_hWnd = AfxCreateWindow(this, title);
+		Win32Window::Win32Window()
+			: m_DefaultBackgnd(new DefaultWndBkgnd()) {
+			AfxCreateWindow(this);
 		}
 
 		Win32Window::~Win32Window() {
+			delete m_DefaultBackgnd;
 		}
 
 		void Win32Window::Show() {
@@ -167,6 +193,8 @@ namespace Framework {
 
 			if (m_Backgnd != nullptr) {
 				m_Backgnd->Draw(graph, Rect(0, 0, width, height));
+			} else {
+				m_DefaultBackgnd->Draw(graph, Rect(0, 0, width, height));
 			}
 
 			BLENDFUNCTION blend;
